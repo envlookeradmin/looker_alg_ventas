@@ -6,12 +6,12 @@ include: "/views/**/*.view.lkml"
 # include all the dashboards
 #include: "/**/*.dashboard"
 
-datagroup: alg_mock_default_datagroup {
+datagroup: alg_facturacion_default_datagroup {
   # sql_trigger: SELECT MAX(id) FROM etl_log;;
   max_cache_age: "1 hour"
 }
 
-persist_with: alg_mock_default_datagroup
+persist_with: alg_facturacion_default_datagroup
 
 explore: bitacora {}
 
