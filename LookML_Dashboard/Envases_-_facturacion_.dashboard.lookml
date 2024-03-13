@@ -1,6 +1,6 @@
 ---
-- dashboard: envases__ventas_
-  title: Envases - ventas_
+- dashboard: envases__facturacion_
+  title: Envases - facturacion_
   layout: newspaper
   preferred_viewer: dashboards-next
   description: ''
@@ -8,7 +8,7 @@
   elements:
   - title: Currency
     name: Currency
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.moneda_transaccion, ventas.s_tipo_cambio]
@@ -81,7 +81,7 @@
     height: 4
   - title: New Tile (Copy 2)
     name: New Tile (Copy 2)
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: single_value
     fields: [ventas.total_amount_mtd]
@@ -143,7 +143,7 @@
     height: 2
   - title: DAILY SALES
     name: DAILY SALES
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: single_value
     fields: [ventas.daily_sales]
@@ -201,7 +201,7 @@
     height: 2
   - title: DAILY SALES (Copy)
     name: DAILY SALES (Copy)
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: single_value
     fields: [ventas.daily_sales_qty]
@@ -258,7 +258,7 @@
     height: 2
   - title: New Tile (Copy 4)
     name: New Tile (Copy 4)
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: single_value
     fields: [ventas.total_qty_mtd]
@@ -315,7 +315,7 @@
     height: 2
   - title: New Tile (Copy 3)
     name: New Tile (Copy 3)
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: single_value
     fields: [ventas.total_amount_ytd]
@@ -373,7 +373,7 @@
     height: 2
   - title: New Tile (Copy 5)
     name: New Tile (Copy 5)
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: single_value
     fields: [ventas.total_qty_ytd]
@@ -430,7 +430,7 @@
     height: 2
   - title: 'Total amount vs last year by category '
     name: 'Total amount vs last year by category '
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_column
     fields: [ventas.total_amount_ytd, ventas.total_amount_ytd_ly, ventas.categoria]
@@ -511,7 +511,7 @@
     height: 6
   - title: "(Better) Top 10 selling products"
     name: "(Better) Top 10 selling products"
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.total_amount_ytd, grupo_material.descripcion]
@@ -596,7 +596,7 @@
     height: 6
   - title: Bottom 10 selling products
     name: Bottom 10 selling products
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.total_amount_ytd, grupo_material.descripcion]
@@ -681,7 +681,7 @@
     height: 6
   - title: Last updates by region
     name: Last updates by region
-    model: alg_ventas
+    model: alg_facturacion
     explore: bitacora
     type: looker_grid
     fields: [bitacora.time_zone, bitacora.date_time]
@@ -746,7 +746,7 @@
     height: 4
   - title: Sales by distribution channel
     name: Sales by distribution channel
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_pie
     fields: [ventas.total_amount_ytd, ventas.canal_distribucion]
@@ -849,7 +849,7 @@
     height: 3
   - title: Category
     name: Category
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.orden_categoria, ventas.categoria, ventas.subcategoria, ventas.daily_sales,
@@ -931,7 +931,7 @@
       type: day_picker
       display: inline
       options: []
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     listens_to_filters: []
     field: ventas.date_filter
@@ -944,7 +944,7 @@
     ui_config:
       type: tag_list
       display: popover
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     listens_to_filters: []
     field: planta.cluster
@@ -957,7 +957,7 @@
     ui_config:
       type: tag_list
       display: popover
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     listens_to_filters: [Cluster]
     field: planta.pais
@@ -970,7 +970,7 @@
     ui_config:
       type: tag_list
       display: popover
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     listens_to_filters: [Pais]
     field: planta.nombre
