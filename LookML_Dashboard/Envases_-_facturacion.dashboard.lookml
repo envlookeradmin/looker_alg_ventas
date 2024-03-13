@@ -1,6 +1,6 @@
 ---
-- dashboard: envases__ventas
-  title: Envases - ventas
+- dashboard: envases__facturacion
+  title: Envases - facturacion
   layout: newspaper
   preferred_viewer: dashboards-next
   description: ''
@@ -8,7 +8,7 @@
   elements:
   - title: CURRENCY
     name: CURRENCY
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.moneda_transaccion, ventas.s_tipo_cambio]
@@ -78,7 +78,7 @@
     height: 5
   - title: SUMMARY
     name: SUMMARY
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [planta.cluster, ventas.daily_sales, ventas.empty_value1, ventas.total_amount_mtd,
@@ -166,7 +166,7 @@
     height: 5
   - title: New Tile
     name: New Tile
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: single_value
     fields: [ventas.fecha_seleccionada]
@@ -221,7 +221,7 @@
     height: 2
   - title: MÉXICO
     name: MÉXICO
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.orden_categoria, ventas.categoria, ventas.subcategoria, ventas.daily_sales,
@@ -334,7 +334,7 @@
     height: 6
   - title: LAST UPDATES BY REGION
     name: LAST UPDATES BY REGION
-    model: alg_ventas
+    model: alg_facturacion
     explore: bitacora
     type: looker_grid
     fields: [bitacora.time_zone, bitacora.date_time]
@@ -399,7 +399,7 @@
     height: 3
   - title: TOTAL
     name: TOTAL
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.categoria, ventas.subcategoria, ventas.daily_sales, ventas.total_amount_mtd,
@@ -480,7 +480,7 @@
     height: 3
   - title: ECN - NORTH
     name: ECN - NORTH
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     type: looker_grid
     fields: [ventas.orden_categoria, ventas.categoria, ventas.subcategoria, ventas.daily_sales,
@@ -602,7 +602,7 @@
       type: day_picker
       display: inline
       options: []
-    model: alg_ventas
+    model: alg_facturacion
     explore: ventas
     listens_to_filters: []
     field: ventas.date_filter
