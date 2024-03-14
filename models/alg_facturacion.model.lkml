@@ -63,4 +63,9 @@ explore: ventas {
     user_attribute: alg_cluster
   }
 
+  access_filter: {
+    field: planta.pais
+    user_attribute: alg_country
+  }
+
 }
