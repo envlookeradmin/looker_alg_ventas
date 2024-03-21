@@ -77,7 +77,7 @@ view: ventas {
       WHERE v.Organizacion_Ventas IN ("MXF1", "MXFC")
       AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,23,24,25,26,27,28,29,30
       UNION ALL
 
       --CARGA TOTAL MXN que no es México
@@ -207,7 +207,7 @@ view: ventas {
       WHERE v.Organizacion_Ventas NOT IN ("MXF1", "MXFC")
       AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,23,24,25,26,27,28,29,30
 
       --CARGA TOTAL USD
       UNION ALL
@@ -336,7 +336,7 @@ view: ventas {
       ) t on v.Fecha = t.Fecha and v.Moneda_Transaccion = t.Moneda_Origen
       WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,23,24,25,26,27,28,29,30
       UNION ALL
 
       --CARGA TOTAL EUR
@@ -465,7 +465,7 @@ view: ventas {
       ) t on v.Fecha = t.Fecha and v.Moneda_Transaccion = t.Moneda_Origen
       WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,23,24,25,26,27,28,29,30
       ;;
   }
 
