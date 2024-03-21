@@ -44,7 +44,7 @@ view: cliente {
 
   dimension: grupo_clientes {
     type: string
-    sql: ${TABLE}.Grupo_Ventas ;;
+    sql: ${TABLE}.Grupo_Clientes ;;
   }
 
 }

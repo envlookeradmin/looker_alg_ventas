@@ -31,12 +31,12 @@ view: planta {
   dimension: cluster {
     label: "CLUSTER"
     type: string
-    sql: ${TABLE}.CLUSTER ;;
+    sql: ${TABLE}.Cluster ;;
   }
 
   dimension: region {
     type: string
-    sql: ${TABLE}.REGION ;;
+    sql: ${TABLE}.Region ;;
   }
 
 }
