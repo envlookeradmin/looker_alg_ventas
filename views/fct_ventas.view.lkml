@@ -729,6 +729,34 @@ view: ventas {
     type: date
   }
 
+  filter: tipo_transaccion_vta_nac {
+    hidden: yes
+    type: yesno
+    sql: ${tipo_transaccion} in ('Venta')
+         and ${canal_distribucion} in ('Nacional') ;;
+  }
+
+  filter: tipo_transaccion_vta_exp {
+    hidden: yes
+    type: yesno
+    sql: ${tipo_transaccion} in ('Venta')
+         and ${canal_distribucion} in ('Exportacion') ;;
+  }
+
+  filter: tipo_transaccion_pre_nac {
+    hidden: yes
+    type: yesno
+    sql: ${tipo_transaccion} in ('Presupuesto')
+         and ${canal_distribucion} in ('Nacional') ;;
+  }
+
+  filter: tipo_transaccion_pre_exp {
+    hidden: yes
+    type: yesno
+    sql: ${tipo_transaccion} in ('Presupuesto')
+      and ${canal_distribucion} in ('Exportacion') ;;
+  }
+
   #DAY
   filter: filtro_dia {
     hidden: yes
@@ -813,7 +841,7 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [tipo_transaccion: "VENTA"]
+    filters: [tipo_transaccion: "Venta"]
 
     drill_fields: [ cliente,nombre_cliente,daily_sales]
 
@@ -831,7 +859,7 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [tipo_transaccion: "VENTA"]
+    filters: [tipo_transaccion: "Venta"]
 
     drill_fields: [ cliente,nombre_cliente,daily_sales]
 
@@ -913,8 +941,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
 
     drill_fields: [cliente,nombre_cliente,national_amount_mtd]
 
@@ -931,8 +964,13 @@ view: ventas {
          THEN ${monto_transaccion_mtd}
          ELSE ${monto_transaccion} END  ;;
 
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_exp
+      value: "yes"
+    }
 
     filters: {
       field: is_current_period
@@ -960,8 +998,8 @@ view: ventas {
     group_label: "Monthly"
     label: "TOTAL AMOUNT BY MONTH"
     type:  number
-    sql: SUM( CASE WHEN ${canal_distribucion} = "NACIONAL" THEN ${monto_transaccion} END ) +
-      SUM( CASE WHEN ${canal_distribucion} = "EXPORTACION" THEN ${monto_transaccion} END ) ;;
+    sql: SUM( CASE WHEN ${canal_distribucion} = "Nacional" THEN ${monto_transaccion} END ) +
+      SUM( CASE WHEN ${canal_distribucion} = "Exportacion" THEN ${monto_transaccion} END ) ;;
   }
 
   measure: national_amount_mtd_ly{
@@ -979,8 +1017,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente,national_amount_mtd_ly]
 
@@ -1003,8 +1046,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_exp
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente,export_amount_mtd_ly]
 
@@ -1026,22 +1074,23 @@ view: ventas {
     group_label: "Monthly"
     label: "% VS TOTAL AMOUNT MTD LY"
     type: number
-    sql: CASE WHEN ${total_amount_mtd} > 0 AND ${total_amount_mtd_ly} = 0 THEN 1
-                                WHEN ${total_amount_mtd} = 0 AND ${total_amount_mtd_ly} > 0 THEN -1
-                                WHEN (${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1 = 0 THEN 0
-                                ELSE (${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1
-                               END *100;;
+    sql: CASE
+          WHEN ${total_amount_mtd} > 0 AND ${total_amount_mtd_ly} = 0 THEN 1
+          WHEN ${total_amount_mtd} = 0 AND ${total_amount_mtd_ly} > 0 THEN -1
+          WHEN (${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1 = 0 THEN 0
+          ELSE (${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1
+         END *100;;
 
     html:
-                      {% if value > 0 %}
-                      <span style="color: green;">{{ rendered_value }}</span></p>
-                      {% elsif  value < 0 %}
-                      <span style="color: red;">{{ rendered_value }}</span></p>
-                      {% elsif  value == 0 %}
-                      {{rendered_value}}
-                      {% else %}
-                      {{rendered_value}}
-                      {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
@@ -1062,8 +1111,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    filters: {
+      field: tipo_transaccion_pre_nac
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, z_national_amount_bud_mtd]
 
@@ -1083,11 +1137,17 @@ view: ventas {
       field: is_current_period
       value: "yes"
     }
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    filters: {
+      field: tipo_transaccion_pre_exp
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, z_export_amount_bud_mtd]
-    #value_format: "#,##0.00"
+
     value_format: "$#,##0.00"
   }
 
@@ -1107,22 +1167,23 @@ view: ventas {
     group_label: "Monthly"
     label: "% VS TOTAL BUD MTD"
     type: number
-    sql: CASE WHEN ${total_amount_mtd} > 0 AND ${total_amount_bud_mtd} = 0 THEN 1
-                                    WHEN ${total_amount_mtd} = 0 AND ${total_amount_bud_mtd} > 0 THEN -1
-                                    WHEN (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1=-1 THEN 0
-                                    ELSE (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1
-                                   END * 100;;
+    sql: CASE
+          WHEN ${total_amount_mtd} > 0 AND ${total_amount_bud_mtd} = 0 THEN 1
+          WHEN ${total_amount_mtd} = 0 AND ${total_amount_bud_mtd} > 0 THEN -1
+          WHEN (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1=-1 THEN 0
+          ELSE (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1
+         END * 100;;
 
     html:
-                          {% if value > 0 %}
-                          <span style="color: green;">{{ rendered_value }}</span></p>
-                          {% elsif  value < 0 %}
-                          <span style="color: red;">{{ rendered_value }}</span></p>
-                          {% elsif  value == 0 %}
-                          {{rendered_value}}
-                          {% else %}
-                          {{rendered_value}}
-                          {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
@@ -1144,8 +1205,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, national_qty_mtd]
 
@@ -1164,8 +1230,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_exp
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, export_qty_mtd]
     value_format: "#,##0"
@@ -1192,8 +1263,14 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
+
     drill_fields: [ cliente,nombre_cliente, national_qty_mtd_ly]
     value_format: "#,##0"
   }
@@ -1205,10 +1282,17 @@ view: ventas {
     label: "EXPORT QTY MTD LY"
     type: sum
     sql: ${cantidad};;
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
     filters: {
       field: is_previous_period
+      value: "yes"
+    }
+
+    filters: {
+      field: tipo_transaccion_vta_exp
       value: "yes"
     }
 
@@ -1231,21 +1315,23 @@ view: ventas {
     group_label: "Monthly"
     label: "% VS TOTAL QTY MTD LY"
     type: number
-    sql: CASE WHEN ${total_qty_mtd} > 0 AND ${total_qty_mtd_ly} = 0 THEN 1
-              WHEN ${total_qty_mtd} = 0 AND ${total_qty_mtd_ly} > 0 THEN -1
-              WHEN (${total_qty_mtd}/NULLIF(${total_qty_mtd_ly},0))-1  = 0 THEN 0
-              ELSE (${total_qty_mtd}/NULLIF(${total_qty_mtd_ly},0))-1   END *100;;
+    sql: CASE
+          WHEN ${total_qty_mtd} > 0 AND ${total_qty_mtd_ly} = 0 THEN 1
+          WHEN ${total_qty_mtd} = 0 AND ${total_qty_mtd_ly} > 0 THEN -1
+          WHEN (${total_qty_mtd}/NULLIF(${total_qty_mtd_ly},0))-1  = 0 THEN 0
+          ELSE (${total_qty_mtd}/NULLIF(${total_qty_mtd_ly},0))-1
+         END *100;;
 
     html:
-              {% if value > 0 %}
-              <span style="color: green;">{{ rendered_value }}</span></p>
-              {% elsif  value < 0 %}
-              <span style="color: red;">{{ rendered_value }}</span></p>
-              {% elsif  value == 0 %}
-              {{rendered_value}}
-              {% else %}
-              {{rendered_value}}
-              {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
@@ -1265,8 +1351,14 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    filters: {
+      field: tipo_transaccion_pre_nac
+      value: "yes"
+    }
+
     drill_fields: [ cliente,nombre_cliente, national_qty_bud_mtd]
   }
 
@@ -1276,10 +1368,17 @@ view: ventas {
     label: "EXPORT QTY BUD MTD"
     type: sum
     sql: ${cantidad} ;;
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
     filters: {
       field: is_current_period
+      value: "yes"
+    }
+
+    filters: {
+      field: tipo_transaccion_pre_exp
       value: "yes"
     }
 
@@ -1301,22 +1400,23 @@ view: ventas {
     group_label: "Monthly"
     label: "% VS TOTAL QTY BUD MTD"
     type: number
-    sql: CASE WHEN ${total_qty_mtd} > 0 AND ${total_qty_bud_mtd} = 0 THEN 1
-              WHEN ${total_qty_mtd} = 0 AND ${total_qty_bud_mtd} > 0 THEN -1
-              WHEN (${total_qty_mtd} /  NULLIF (${total_qty_bud_mtd},0))-1= 0 THEN 0
-              ELSE (${total_qty_mtd} /  NULLIF (${total_qty_bud_mtd},0))-1
-             END *100 ;;
+    sql: CASE
+          WHEN ${total_qty_mtd} > 0 AND ${total_qty_bud_mtd} = 0 THEN 1
+          WHEN ${total_qty_mtd} = 0 AND ${total_qty_bud_mtd} > 0 THEN -1
+          WHEN (${total_qty_mtd} /  NULLIF (${total_qty_bud_mtd},0))-1= 0 THEN 0
+          ELSE (${total_qty_mtd} /  NULLIF (${total_qty_bud_mtd},0))-1
+         END *100 ;;
 
     html:
-                  {% if value > 0 %}
-                  <span style="color: green;">{{ rendered_value }}</span></p>
-                  {% elsif  value < 0 %}
-                  <span style="color: red;">{{ rendered_value }}</span></p>
-                  {% elsif  value == 0 %}
-                  {{rendered_value}}
-                  {% else %}
-                  {{rendered_value}}
-                  {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
@@ -1348,7 +1448,7 @@ view: ventas {
     type: max
     sql:  CASE
            WHEN ${fecha} >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
-    and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+           and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
            THEN ${TABLE}.UKURS_YTD_LY
            ELSE 0
            END  ;;
@@ -1376,7 +1476,7 @@ view: ventas {
     type: max
     sql:  CASE
            WHEN ${fecha} >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
-    and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+           and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
            THEN ${TABLE}.UKURS_YTD_LY*1.2
            ELSE 0
            END  ;;
@@ -1399,8 +1499,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
 
     drill_fields: [cliente,nombre_cliente,national_amount_ytd]
 
@@ -1417,10 +1522,16 @@ view: ventas {
          THEN ${monto_transaccion_ytd}
          ELSE ${monto_transaccion} END ;;
 
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
     filters: {
       field: is_current_year
+      value: "yes"
+    }
+
+    filters: {
+      field: tipo_transaccion_vta_exp
       value: "yes"
     }
 
@@ -1456,8 +1567,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente,national_amount_ytd_ly]
 
@@ -1480,8 +1596,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_exp
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente,export_amount_ytd_ly]
 
@@ -1503,22 +1624,23 @@ view: ventas {
     group_label: "Annual"
     label: "% VS TOTAL AMOUNT YTD LY"
     type: number
-    sql: CASE WHEN ${total_amount_ytd} > 0 AND ${total_amount_ytd_ly} = 0 THEN 1
-                                WHEN ${total_amount_ytd} = 0 AND ${total_amount_ytd_ly} > 0 THEN -1
-                                WHEN (${total_amount_ytd} /  NULLIF (${total_amount_ytd_ly},0))-1 = 0 THEN 0
-                                ELSE (${total_amount_ytd} /  NULLIF (${total_amount_ytd_ly},0))-1
-                               END *100;;
+    sql: CASE
+          WHEN ${total_amount_ytd} > 0 AND ${total_amount_ytd_ly} = 0 THEN 1
+          WHEN ${total_amount_ytd} = 0 AND ${total_amount_ytd_ly} > 0 THEN -1
+          WHEN (${total_amount_ytd} /  NULLIF (${total_amount_ytd_ly},0))-1 = 0 THEN 0
+          ELSE (${total_amount_ytd} /  NULLIF (${total_amount_ytd_ly},0))-1
+         END *100;;
 
     html:
-                      {% if value > 0 %}
-                      <span style="color: green;">{{ rendered_value }}</span></p>
-                      {% elsif  value < 0 %}
-                      <span style="color: red;">{{ rendered_value }}</span></p>
-                      {% elsif  value == 0 %}
-                      {{rendered_value}}
-                      {% else %}
-                      {{rendered_value}}
-                      {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
@@ -1539,8 +1661,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    filters: {
+      field: tipo_transaccion_pre_nac
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, z_national_amount_bud_ytd]
 
@@ -1561,11 +1688,17 @@ view: ventas {
       field: is_current_year
       value: "yes"
     }
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    filters: {
+      field: tipo_transaccion_pre_exp
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, z_export_amount_bud_ytd]
-    #value_format: "#,##0.00"
+
     value_format: "$#,##0.00"
   }
 
@@ -1585,22 +1718,23 @@ view: ventas {
     group_label: "Annual"
     label: "% VS TOTAL BUD YTD"
     type: number
-    sql: CASE WHEN ${total_amount_ytd} > 0 AND ${total_amount_bud_ytd} = 0 THEN 1
-                                    WHEN ${total_amount_ytd} = 0 AND ${total_amount_bud_ytd} > 0 THEN -1
-                                    WHEN (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1=-1 THEN 0
-                                    ELSE (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1
-                                   END * 100;;
+    sql: CASE
+          WHEN ${total_amount_ytd} > 0 AND ${total_amount_bud_ytd} = 0 THEN 1
+          WHEN ${total_amount_ytd} = 0 AND ${total_amount_bud_ytd} > 0 THEN -1
+          WHEN (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1=-1 THEN 0
+          ELSE (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1
+         END * 100;;
 
     html:
-                          {% if value > 0 %}
-                          <span style="color: green;">{{ rendered_value }}</span></p>
-                          {% elsif  value < 0 %}
-                          <span style="color: red;">{{ rendered_value }}</span></p>
-                          {% elsif  value == 0 %}
-                          {{rendered_value}}
-                          {% else %}
-                          {{rendered_value}}
-                          {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
@@ -1625,8 +1759,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, national_qty_ytd]
 
@@ -1645,8 +1784,13 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_exp
+      value: "yes"
+    }
 
     drill_fields: [ cliente,nombre_cliente, export_qty_ytd]
     value_format: "#,##0"
@@ -1673,8 +1817,14 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "VENTA"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "VENTA"]
+
+    filters: {
+      field: tipo_transaccion_vta_nac
+      value: "yes"
+    }
+
     drill_fields: [ cliente,nombre_cliente, national_qty_ytd_ly]
     value_format: "#,##0"
   }
@@ -1686,10 +1836,17 @@ view: ventas {
     label: "EXPORT QTY YTD LY"
     type: sum
     sql: ${cantidad};;
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "VENTA"]
+
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
+
     filters: {
       field: is_previous_year
+      value: "yes"
+    }
+
+    filters: {
+      field: tipo_transaccion_vta_exp
       value: "yes"
     }
 
@@ -1712,21 +1869,23 @@ view: ventas {
     group_label: "Annual"
     label: "% VS TOTAL QTY YTD LY"
     type: number
-    sql: CASE WHEN ${total_qty_ytd} > 0 AND ${total_qty_ytd_ly} = 0 THEN 1
-              WHEN ${total_qty_ytd} = 0 AND ${total_qty_ytd_ly} > 0 THEN -1
-              WHEN (${total_qty_ytd}/NULLIF(${total_qty_ytd_ly},0))-1  = 0 THEN 0
-              ELSE (${total_qty_ytd}/NULLIF(${total_qty_ytd_ly},0))-1   END *100;;
+    sql: CASE
+          WHEN ${total_qty_ytd} > 0 AND ${total_qty_ytd_ly} = 0 THEN 1
+          WHEN ${total_qty_ytd} = 0 AND ${total_qty_ytd_ly} > 0 THEN -1
+          WHEN (${total_qty_ytd}/NULLIF(${total_qty_ytd_ly},0))-1 = 0 THEN 0
+          ELSE (${total_qty_ytd}/NULLIF(${total_qty_ytd_ly},0))-1
+         END *100;;
 
     html:
-              {% if value > 0 %}
-              <span style="color: green;">{{ rendered_value }}</span></p>
-              {% elsif  value < 0 %}
-              <span style="color: red;">{{ rendered_value }}</span></p>
-              {% elsif  value == 0 %}
-              {{rendered_value}}
-              {% else %}
-              {{rendered_value}}
-              {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
@@ -1746,8 +1905,14 @@ view: ventas {
       value: "yes"
     }
 
-    filters: [canal_distribucion: "NACIONAL"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+    #filters: [canal_distribucion: "NACIONAL"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    filters: {
+      field: tipo_transaccion_pre_nac
+      value: "yes"
+    }
+
     drill_fields: [ cliente,nombre_cliente, national_qty_bud_ytd]
   }
 
@@ -1757,10 +1922,17 @@ view: ventas {
     label: "EXPORT QTY BUD YTD"
     type: sum
     sql: ${cantidad} ;;
-    filters: [canal_distribucion: "EXPORTACION"]
-    filters: [tipo_transaccion: "PRESUPUESTO"]
+
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "PRESUPUESTO"]
+
     filters: {
       field: is_current_year
+      value: "yes"
+    }
+
+    filters: {
+      field: tipo_transaccion_pre_exp
       value: "yes"
     }
 
@@ -1782,22 +1954,23 @@ view: ventas {
     group_label: "Annual"
     label: "% VS TOTAL QTY BUD YTD"
     type: number
-    sql: CASE WHEN ${total_qty_ytd} > 0 AND ${total_qty_bud_ytd} = 0 THEN 1
-              WHEN ${total_qty_ytd} = 0 AND ${total_qty_bud_ytd} > 0 THEN -1
-              WHEN (${total_qty_ytd} /  NULLIF (${total_qty_bud_ytd},0))-1= 0 THEN 0
-              ELSE (${total_qty_ytd} /  NULLIF (${total_qty_bud_ytd},0))-1
-             END *100 ;;
+    sql: CASE
+          WHEN ${total_qty_ytd} > 0 AND ${total_qty_bud_ytd} = 0 THEN 1
+          WHEN ${total_qty_ytd} = 0 AND ${total_qty_bud_ytd} > 0 THEN -1
+          WHEN (${total_qty_ytd} /  NULLIF (${total_qty_bud_ytd},0))-1= 0 THEN 0
+          ELSE (${total_qty_ytd} /  NULLIF (${total_qty_bud_ytd},0))-1
+         END *100 ;;
 
     html:
-                  {% if value > 0 %}
-                  <span style="color: green;">{{ rendered_value }}</span></p>
-                  {% elsif  value < 0 %}
-                  <span style="color: red;">{{ rendered_value }}</span></p>
-                  {% elsif  value == 0 %}
-                  {{rendered_value}}
-                  {% else %}
-                  {{rendered_value}}
-                  {% endif %} ;;
+          {% if value > 0 %}
+          <span style="color: green;">{{ rendered_value }}</span></p>
+          {% elsif  value < 0 %}
+          <span style="color: red;">{{ rendered_value }}</span></p>
+          {% elsif  value == 0 %}
+          {{rendered_value}}
+          {% else %}
+          {{rendered_value}}
+          {% endif %} ;;
 
     value_format: "0.00\%"
 
