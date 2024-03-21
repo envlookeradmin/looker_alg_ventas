@@ -505,6 +505,7 @@ view: ventas {
   }
 
   dimension: codigo_canal_distribucion {
+    hidden: yes
     type: string
     sql: ${TABLE}.Canal_Distribucion ;;
   }
@@ -512,9 +513,8 @@ view: ventas {
   dimension: canal_distribucion {
     type: string
     sql: CASE
-          WHEN ${TABLE}.Canal_Distribucion = '10' THEN 'Nacional'
-          WHEN ${TABLE}.Canal_Distribucion = '50' THEN 'Nacional'
-          WHEN ${TABLE}.Canal_Distribucion = '20' THEN 'Exportacion'
+          WHEN ${TABLE}.Canal_Distribucion IN ('10','50') THEN 'Nacional'
+          ELSE 'Exportacion'
           END ;;
   }
 
