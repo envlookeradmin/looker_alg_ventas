@@ -17,7 +17,7 @@ view: cliente {
     sql: ${TABLE}.Organizacion_Ventas ;;
   }
 
-  dimension: canal_distribucion {
+  dimension: codigo_canal_distribucion {
     type: string
     sql: ${TABLE}.Canal_Distribucion ;;
   }
@@ -42,7 +42,7 @@ view: cliente {
     sql: ${TABLE}.Ciudad ;;
   }
 
-  dimension: grupo_clientes {
+  dimension: codigo_grupo_clientes {
     type: string
     sql: ${TABLE}.Grupo_Clientes ;;
   }

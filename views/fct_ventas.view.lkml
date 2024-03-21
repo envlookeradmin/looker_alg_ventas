@@ -504,24 +504,33 @@ view: ventas {
     sql: ${TABLE}.Fecha ;;
   }
 
-  dimension: canal_distribucion {
+  dimension: codigo_canal_distribucion {
     type: string
     sql: ${TABLE}.Canal_Distribucion ;;
   }
 
-  dimension: material {
+  dimension: canal_distribucion {
+    type: string
+    sql: CASE
+          WHEN ${TABLE}.Canal_Distribucion = '10' THEN 'Nacional'
+          WHEN ${TABLE}.Canal_Distribucion = '50' THEN 'Nacional'
+          WHEN ${TABLE}.Canal_Distribucion = '20' THEN 'Exportacion'
+          END ;;
+  }
+
+  dimension: codigo_material {
     hidden: yes
     type: string
     sql: ${TABLE}.Material ;;
   }
 
-  dimension: planta {
+  dimension: id_planta {
     hidden: yes
     type: string
     sql: ${TABLE}.Planta ;;
   }
 
-  dimension: cliente {
+  dimension: codigo_cliente {
     hidden: yes
     type: string
     sql: ${TABLE}.Cliente ;;
@@ -754,7 +763,7 @@ view: ventas {
     hidden: yes
     type: yesno
     sql: ${tipo_transaccion} in ('Presupuesto')
-      and ${canal_distribucion} in ('Exportacion') ;;
+         and ${canal_distribucion} in ('Exportacion') ;;
   }
 
   #DAY
@@ -843,7 +852,7 @@ view: ventas {
 
     filters: [tipo_transaccion: "Venta"]
 
-    drill_fields: [ cliente,nombre_cliente,daily_sales]
+    drill_fields: [ codigo_cliente,nombre_cliente,daily_sales]
 
     value_format: "$#,##0.00"
   }
@@ -861,7 +870,7 @@ view: ventas {
 
     filters: [tipo_transaccion: "Venta"]
 
-    drill_fields: [ cliente,nombre_cliente,daily_sales]
+    drill_fields: [ codigo_cliente,nombre_cliente,daily_sales]
 
     value_format: "#,##0"
   }
@@ -949,7 +958,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [cliente,nombre_cliente,national_amount_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente,national_amount_mtd]
 
     value_format: "$#,##0.00"
   }
@@ -977,7 +986,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente,export_amount_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente,export_amount_mtd]
 
     value_format: "$#,##0.00"
   }
@@ -989,7 +998,7 @@ view: ventas {
     type: number
     sql: ${national_amount_mtd} + ${export_amount_mtd} ;;
 
-    drill_fields: [ cliente,nombre_cliente,total_amount_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente,total_amount_mtd]
 
     value_format: "$#,##0.00"
   }
@@ -1025,7 +1034,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente,national_amount_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente,national_amount_mtd_ly]
 
     value_format: "$#,##0.00"
   }
@@ -1054,7 +1063,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente,export_amount_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente,export_amount_mtd_ly]
 
     value_format: "$#,##0.00"
   }
@@ -1065,7 +1074,7 @@ view: ventas {
     type: number
     sql: ${national_amount_mtd_ly} + ${export_amount_mtd_ly} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_amount_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_amount_mtd_ly]
 
     value_format: "$#,##0.00"
   }
@@ -1094,7 +1103,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente, vs_total_amount_mtd_ly, total_amount_mtd, total_amount_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, vs_total_amount_mtd_ly, total_amount_mtd, total_amount_mtd_ly]
   }
 
   measure: z_national_amount_bud_mtd{
@@ -1119,7 +1128,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, z_national_amount_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, z_national_amount_bud_mtd]
 
     value_format: "$#,##0.00"
   }
@@ -1146,7 +1155,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, z_export_amount_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, z_export_amount_bud_mtd]
 
     value_format: "$#,##0.00"
   }
@@ -1157,7 +1166,7 @@ view: ventas {
     type: number
     sql: ${z_national_amount_bud_mtd} + ${z_export_amount_bud_mtd} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_amount_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_amount_bud_mtd]
 
     value_format: "$#,##0.00"
   }
@@ -1187,7 +1196,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente,vs_total_bud_mtd,total_amount_mtd,total_amount_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente,vs_total_bud_mtd,total_amount_mtd,total_amount_bud_mtd]
 
   }
 
@@ -1213,7 +1222,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, national_qty_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, national_qty_mtd]
 
     value_format: "#,##0"
   }
@@ -1238,7 +1247,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, export_qty_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, export_qty_mtd]
     value_format: "#,##0"
   }
 
@@ -1247,7 +1256,7 @@ view: ventas {
     label: "TOTAL QTY MTD"
     type: number
     sql: ${national_qty_mtd} + ${export_qty_mtd} ;;
-    drill_fields: [ cliente,nombre_cliente, total_qty_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_qty_mtd]
     value_format: "#,##0"
   }
 
@@ -1271,7 +1280,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, national_qty_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, national_qty_mtd_ly]
     value_format: "#,##0"
   }
 
@@ -1296,7 +1305,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, export_qty_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, export_qty_mtd_ly]
     value_format: "#,##0.00"
   }
 
@@ -1307,7 +1316,7 @@ view: ventas {
     type: number
     sql: ${national_qty_mtd_ly} + ${export_qty_mtd_ly} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_qty_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_qty_mtd_ly]
     value_format: "#,##0.00"
   }
 
@@ -1335,7 +1344,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente, vs_total_qty_mtd_ly,total_qty_mtd,total_qty_mtd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, vs_total_qty_mtd_ly,total_qty_mtd,total_qty_mtd_ly]
 
   }
 
@@ -1359,7 +1368,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, national_qty_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, national_qty_bud_mtd]
   }
 
   measure: export_qty_bud_mtd {
@@ -1382,7 +1391,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, export_qty_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, export_qty_bud_mtd]
     value_format: "#,##0.00"
   }
 
@@ -1392,7 +1401,7 @@ view: ventas {
     type: number
     sql: ${national_qty_bud_mtd} + ${export_qty_bud_mtd} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_qty_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_qty_bud_mtd]
     value_format: "#,##0"
   }
 
@@ -1420,7 +1429,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente, vs_total_qty_bud_mtd,total_qty_mtd,total_qty_bud_mtd]
+    drill_fields: [ codigo_cliente,nombre_cliente, vs_total_qty_bud_mtd,total_qty_mtd,total_qty_bud_mtd]
 
   }
 
@@ -1507,7 +1516,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [cliente,nombre_cliente,national_amount_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente,national_amount_ytd]
 
     value_format: "$#,##0.00"
   }
@@ -1535,7 +1544,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente,export_amount_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente,export_amount_ytd]
 
     value_format: "$#,##0.00"
   }
@@ -1547,7 +1556,7 @@ view: ventas {
     type: number
     sql: ${national_amount_ytd} + ${export_amount_ytd} ;;
 
-    drill_fields: [ cliente,nombre_cliente,total_amount_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente,total_amount_ytd]
 
     value_format: "$#,##0.00"
   }
@@ -1575,7 +1584,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente,national_amount_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente,national_amount_ytd_ly]
 
     value_format: "$#,##0.00"
   }
@@ -1604,7 +1613,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente,export_amount_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente,export_amount_ytd_ly]
 
     value_format: "$#,##0.00"
   }
@@ -1615,7 +1624,7 @@ view: ventas {
     type: number
     sql: ${national_amount_ytd_ly} + ${export_amount_ytd_ly} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_amount_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_amount_ytd_ly]
 
     value_format: "$#,##0.00"
   }
@@ -1644,7 +1653,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente, vs_total_amount_ytd_ly, total_amount_ytd, total_amount_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, vs_total_amount_ytd_ly, total_amount_ytd, total_amount_ytd_ly]
   }
 
   measure: z_national_amount_bud_ytd{
@@ -1669,7 +1678,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, z_national_amount_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, z_national_amount_bud_ytd]
 
     value_format: "$#,##0.00"
   }
@@ -1697,7 +1706,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, z_export_amount_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, z_export_amount_bud_ytd]
 
     value_format: "$#,##0.00"
   }
@@ -1708,7 +1717,7 @@ view: ventas {
     type: number
     sql: ${z_national_amount_bud_ytd} + ${z_export_amount_bud_ytd} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_amount_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_amount_bud_ytd]
 
     value_format: "$#,##0.00"
   }
@@ -1738,7 +1747,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente,vs_total_bud_ytd,total_amount_ytd,total_amount_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente,vs_total_bud_ytd,total_amount_ytd,total_amount_bud_ytd]
 
   }
 
@@ -1767,7 +1776,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, national_qty_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, national_qty_ytd]
 
     value_format: "#,##0"
   }
@@ -1792,7 +1801,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, export_qty_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, export_qty_ytd]
     value_format: "#,##0"
   }
 
@@ -1801,7 +1810,7 @@ view: ventas {
     label: "TOTAL QTY YTD"
     type: number
     sql: ${national_qty_ytd} + ${export_qty_ytd} ;;
-    drill_fields: [ cliente,nombre_cliente, total_qty_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_qty_ytd]
     value_format: "#,##0"
   }
 
@@ -1825,7 +1834,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, national_qty_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, national_qty_ytd_ly]
     value_format: "#,##0"
   }
 
@@ -1850,7 +1859,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, export_qty_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, export_qty_ytd_ly]
     value_format: "#,##0.00"
   }
 
@@ -1861,7 +1870,7 @@ view: ventas {
     type: number
     sql: ${national_qty_ytd_ly} + ${export_qty_ytd_ly} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_qty_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_qty_ytd_ly]
     value_format: "#,##0.00"
   }
 
@@ -1889,7 +1898,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente, vs_total_qty_ytd_ly,total_qty_ytd,total_qty_ytd_ly]
+    drill_fields: [ codigo_cliente,nombre_cliente, vs_total_qty_ytd_ly,total_qty_ytd,total_qty_ytd_ly]
 
   }
 
@@ -1913,7 +1922,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, national_qty_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, national_qty_bud_ytd]
   }
 
   measure: export_qty_bud_ytd {
@@ -1936,7 +1945,7 @@ view: ventas {
       value: "yes"
     }
 
-    drill_fields: [ cliente,nombre_cliente, export_qty_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, export_qty_bud_ytd]
     value_format: "#,##0.00"
   }
 
@@ -1946,7 +1955,7 @@ view: ventas {
     type: number
     sql: ${national_qty_bud_ytd} + ${export_qty_bud_ytd} ;;
 
-    drill_fields: [ cliente,nombre_cliente, total_qty_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, total_qty_bud_ytd]
     value_format: "#,##0"
   }
 
@@ -1974,7 +1983,7 @@ view: ventas {
 
     value_format: "0.00\%"
 
-    drill_fields: [ cliente,nombre_cliente, vs_total_qty_bud_ytd,total_qty_ytd,total_qty_bud_ytd]
+    drill_fields: [ codigo_cliente,nombre_cliente, vs_total_qty_bud_ytd,total_qty_ytd,total_qty_bud_ytd]
 
   }
 

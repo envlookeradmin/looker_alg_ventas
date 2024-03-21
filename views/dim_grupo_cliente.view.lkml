@@ -8,7 +8,7 @@ view: grupo_cliente {
     sql: ${TABLE}.ID_Fuente;;
   }
 
-  dimension: codigo_grupo {
+  dimension: codigo_grupo_clientes {
     type: string
     sql: ${TABLE}.Codigo_Grupo ;;
   }

@@ -8,7 +8,7 @@ view: grupo_material {
     sql: ${TABLE}.ID_Fuente ;;
   }
 
-  dimension: codigo_grupo {
+  dimension: codigo_grupo_materiales {
     type: string
     sql: ${TABLE}.Codigo_Grupo ;;
   }

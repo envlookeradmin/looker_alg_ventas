@@ -23,36 +23,36 @@ explore: ventas {
   }
   join: planta {
     type: left_outer
-    sql_on: ${ventas.planta} = ${planta.id_planta}
+    sql_on: ${ventas.id_planta} = ${planta.id_planta}
             and ${ventas.id_fuente} = ${planta.id_fuente} ;;
     relationship: many_to_one
   }
   join: cliente {
     type: left_outer
-    sql_on: ${ventas.cliente} = ${cliente.codigo_cliente}
+    sql_on: ${ventas.codigo_cliente} = ${cliente.codigo_cliente}
             and ${ventas.id_fuente} = ${cliente.id_fuente}
             and ${ventas.organizacion_ventas} = ${cliente.organizacion_ventas}
-            and ${ventas.canal_distribucion} = ${cliente.canal_distribucion};;
+            and ${ventas.codigo_canal_distribucion} = ${cliente.codigo_canal_distribucion};;
     relationship: many_to_one
   }
 
   join: grupo_cliente {
     type: left_outer
-    sql_on: ${cliente.grupo_clientes} = ${grupo_cliente.codigo_grupo}
+    sql_on: ${cliente.codigo_grupo_clientes} = ${grupo_cliente.codigo_grupo_clientes}
             and ${cliente.id_fuente} = ${grupo_cliente.id_fuente};;
     relationship: many_to_one
   }
 
   join: material {
     type: left_outer
-    sql_on: ${ventas.material} = ${material.codigo_material}
+    sql_on: ${ventas.codigo_material} = ${material.codigo_material}
             and ${ventas.id_fuente} = ${material.id_fuente} ;;
     relationship: many_to_one
   }
 
   join: grupo_material {
     type: left_outer
-    sql_on: ${material.grupo_materiales} = ${grupo_material.codigo_grupo}
+    sql_on: ${material.codigo_grupo_materiales} = ${grupo_material.codigo_grupo_materiales}
             and ${material.id_fuente} = ${grupo_material.id_fuente};;
     relationship: many_to_one
   }

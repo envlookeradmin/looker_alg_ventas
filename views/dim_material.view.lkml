@@ -18,7 +18,7 @@ view: material {
     sql: ${TABLE}.Descripcion ;;
   }
 
-  dimension: grupo_materiales {
+  dimension: codigo_grupo_materiales {
     type: string
     sql: ${TABLE}.Grupo_Mat ;;
   }
