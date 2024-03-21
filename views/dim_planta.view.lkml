@@ -1,42 +1,31 @@
 view: planta {
-  derived_table: {
-    sql:
-       SELECT
-        ID_FUENTE,
-        CODIGO_PLANTA,
-        NOMBRE,
-        CIUDAD,
-        PAIS,
-        CLUSTER,
-        REGION
-       FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_dim_planta`
-       ;;
-  }
+
+ sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_Planta` ;;
 
 
   dimension: id_fuente {
     type: string
-    sql: ${TABLE}.ID_FUENTE;;
+    sql: ${TABLE}.ID_Fuente;;
   }
 
-  dimension: codigo_planta {
+  dimension: id_planta {
     type: string
-    sql: ${TABLE}.CODIGO_PLANTA ;;
+    sql: ${TABLE}.ID_Planta ;;
   }
 
-  dimension: nombre {
+  dimension: nombre_planta {
     type: string
-    sql: ${TABLE}.NOMBRE ;;
+    sql: ${TABLE}.Nombre_Planta;;
   }
 
   dimension: ciudad {
     type: string
-    sql: ${TABLE}.CIUDAD ;;
+    sql: ${TABLE}.Ciudad ;;
   }
 
   dimension: pais {
     type: string
-    sql: ${TABLE}.PAIS ;;
+    sql: ${TABLE}.Pais ;;
   }
 
   dimension: cluster {

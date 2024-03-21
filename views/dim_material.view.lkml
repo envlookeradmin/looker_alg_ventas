@@ -1,46 +1,36 @@
 view: material {
-  derived_table: {
-    sql:
-       SELECT
-      ID_FUENTE,
-      CODIGO_MATERIAL,
-      DESCRIPCION,
-      GRUPO_MATERIALES,
-      DIMENSION,
-      JERARQUIA
-      FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_dim_materiales`
-       ;;
-  }
+
+  sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_Material` ;;
 
 
   dimension: id_fuente {
     type: string
-    sql: ${TABLE}.ID_FUENTE;;
+    sql: ${TABLE}.ID_Fuente ;;
   }
 
   dimension: codigo_material {
     type: string
-    sql: ${TABLE}.CODIGO_MATERIAL ;;
+    sql: ${TABLE}.Material ;;
   }
 
   dimension: descripcion {
     type: string
-    sql: ${TABLE}.DESCRIPCION ;;
+    sql: ${TABLE}.Descripcion ;;
   }
 
   dimension: grupo_materiales {
     type: string
-    sql: ${TABLE}.GRUPO_MATERIALES ;;
+    sql: ${TABLE}.Grupo_Mat ;;
   }
 
   dimension: dimension {
     type: string
-    sql: ${TABLE}.DIMENSION ;;
+    sql: ${TABLE}.Dimensiones ;;
   }
 
   dimension: jerarquia {
     type: string
-    sql: ${TABLE}.JERARQUIA ;;
+    sql: ${TABLE}.Jerarquia ;;
   }
 
 }

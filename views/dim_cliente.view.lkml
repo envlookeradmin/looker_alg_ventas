@@ -1,70 +1,50 @@
 view: cliente {
-  derived_table: {
-    sql:
-       SELECT
-      ID_FUENTE,
-      CODIGO_CLIENTE,
-      ORGANIZACION_VENTAS,
-      OFICINA_VENTAS,
-      CANAL_DISTRIBUCION,
-      SECTOR,
-      NOMBRE,
-      PAIS,
-      CIUDAD,
-      GRUPO_CLIENTES
-      FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_dim_cliente`
-       ;;
-  }
 
+  sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_Cliente` ;;
 
   dimension: id_fuente {
     type: string
-    sql: ${TABLE}.ID_FUENTE;;
+    sql: ${TABLE}.ID_Fuente;;
   }
 
   dimension: codigo_cliente {
     type: string
-    sql: ${TABLE}.CODIGO_CLIENTE ;;
+    sql: ${TABLE}.Codigo_Cliente ;;
   }
 
   dimension: organizacion_ventas {
     type: string
-    sql: ${TABLE}.ORGANIZACION_VENTAS ;;
-  }
-
-  dimension: oficina_ventas {
-    type: string
-    sql: ${TABLE}.OFICINA_VENTAS ;;
+    sql: ${TABLE}.Organizacion_Ventas ;;
   }
 
   dimension: canal_distribucion {
     type: string
-    sql: ${TABLE}.CANAL_DISTRIBUCION ;;
+    sql: ${TABLE}.Canal_Distribucion ;;
   }
 
-  dimension: sector {
+  dimension: division {
     type: string
-    sql: ${TABLE}.SECTOR ;;
+    sql: ${TABLE}.Division ;;
   }
 
   dimension: nombre {
     type: string
-    sql: ${TABLE}.NOMBRE;;
+    sql: ${TABLE}.Nombre ;;
   }
 
   dimension: pais {
     type: string
-    sql: ${TABLE}.PAIS;;
+    sql: ${TABLE}.Pais ;;
   }
 
   dimension: ciudad {
     type: string
-    sql: ${TABLE}.CIUDAD ;;
+    sql: ${TABLE}.Ciudad ;;
   }
 
   dimension: grupo_clientes {
     type: string
-    sql: ${TABLE}.GRUPO_CLIENTES ;;
+    sql: ${TABLE}.Grupo_Ventas ;;
   }
 
 }

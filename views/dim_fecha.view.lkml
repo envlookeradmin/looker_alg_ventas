@@ -1,15 +1,6 @@
 view: fecha {
-  derived_table: {
-    sql:
-    select
-    calday,
-    date,
-    year,
-    month,
-    day,
-    quarter
-    from `envases-analytics-qa.ENVASES_REPORTING.CALENDAR`;;
-  }
+
+  sql_table_name: `envases-analytics-qa.ENVASES_REPORTING.CALENDAR` ;;
 
   dimension_group: date {
     type: time

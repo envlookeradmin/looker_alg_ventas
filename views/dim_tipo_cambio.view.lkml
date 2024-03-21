@@ -1,15 +1,6 @@
 view: tipo_cambio {
-  derived_table: {
-    sql:
-       SELECT
-        ID_Fuente,
-        Fecha,
-        Moneda_Origen,
-        Moneda_Conversion,
-        Tipo_Cambio
-        FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_dim_tipo_cambio`
-       ;;
-  }
+
+  sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_Divisas` ;;
 
 
   dimension: id_fuente {
@@ -35,6 +26,11 @@ view: tipo_cambio {
   dimension: tipo_cambio {
     type: number
     sql: ${TABLE}.Tipo_Cambio;;
+  }
+
+  dimension: presupuesto {
+    type: number
+    sql: ${TABLE}.Presupuesto;;
   }
 
 }

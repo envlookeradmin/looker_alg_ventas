@@ -2,182 +2,551 @@ view: ventas {
 
   derived_table: {
     sql:
-       SELECT
-        ID_FUENTE,
-        DOCUMENTO,
-        POSICION,
-        TIPO_TRANSACCION,
-        TIPO_DOCUMENTO,
-        FECHA,
-        CANAL_DISTRIBUCION,
-        MATERIAL,
-        PLANTA,
-        CLIENTE,
-        DESTINATARIO,
-        ORGANIZACION_VENTAS,
-        OFICINA_VENTAS,
-        UNIDAD_BASE,
-        CATEGORIA,
-        SUBCATEGORIA,
-        MONEDA_TRANSACCION,
-        CANTIDAD,
-        MONTO_TRANSACCION,
-        TIPO_CAMBIO,
-        MONTO_MXN
-        FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_fct_ventas`
-        UNION ALL
-        SELECT
-        v.ID_FUENTE,
-        '' AS DOCUMENTO,
-        '' AS POSICION,
-        v.TIPO_TRANSACCION,
-        '' AS TIPO_DOCUMENTO,
-        v.FECHA,
-        v.CANAL_DISTRIBUCION,
-        '' AS MATERIAL,
-        v.PLANTA,
-        '' AS CLIENTE,
-        '' AS DESTINATARIO,
-        '' AS ORGANIZACION_VENTAS,
-        '' AS OFICINA_VENTAS,
-        '' AS UNIDAD_BASE,
-        'TOTAL USD' AS CATEGORIA,
-        '' AS SUBCATEGORIA,
-        '' AS MONEDA_TRANSACCION,
-        0 AS CANTIDAD,
-        SUM(v.MONTO_TRANSACCION * cast(t.Tipo_Cambio as numeric) ) AS MONTO_TRANSACCION,
-        0 TIPO_CAMBIO,
-        0 MONTO_MXN
-        FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_fct_ventas` v left join (SELECT
-        ID_Fuente,
-        Fecha,
-        Moneda_Origen,
-        Moneda_Conversion,
-        Tipo_Cambio
-        FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_dim_tipo_cambio`
-        where Moneda_Origen IN ('MXN', 'EUR', 'DKK', 'GTQ', 'CAD')
-        AND Moneda_Conversion IN ('USD') ) t on v.fecha = t.fecha and v.MONEDA_TRANSACCION = t.Moneda_Origen
-        GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21
-        UNION ALL
-        SELECT
-        v.ID_FUENTE,
-        '' AS DOCUMENTO,
-        '' AS POSICION,
-        v.TIPO_TRANSACCION,
-        '' AS TIPO_DOCUMENTO,
-        v.FECHA,
-        v.CANAL_DISTRIBUCION,
-        '' AS MATERIAL,
-        v.PLANTA,
-        '' AS CLIENTE,
-        '' AS DESTINATARIO,
-        '' AS ORGANIZACION_VENTAS,
-        '' AS OFICINA_VENTAS,
-        '' AS UNIDAD_BASE,
-        'TOTAL EUR' AS CATEGORIA,
-        '' AS SUBCATEGORIA,
-        '' AS MONEDA_TRANSACCION,
-        0 AS CANTIDAD,
-        SUM(v.MONTO_TRANSACCION * cast(t.Tipo_Cambio as numeric) ) AS MONTO_TRANSACCION,
-        0 TIPO_CAMBIO,
-        0 MONTO_MXN
-        FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_fct_ventas` v left join (SELECT
-        ID_Fuente,
-        Fecha,
-        Moneda_Origen,
-        Moneda_Conversion,
-        Tipo_Cambio
-        FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_dim_tipo_cambio`
-        where Moneda_Origen IN ('MXN', 'USD', 'DKK', 'GTQ', 'CAD')
-        AND Moneda_Conversion IN ('EUR') ) t on v.fecha = t.fecha and v.MONEDA_TRANSACCION = t.Moneda_Origen
-        GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21
-       ;;
+      SELECT
+      ID_Fuente,
+      Documento,
+      Posicion,
+      Tipo_Transaccion,
+      Tipo_Documento,
+      Fecha,
+      Canal_Distribucion,
+      Material,
+      Planta,
+      Cliente,
+      Destinatario,
+      Organizacion_Ventas,
+      Unidad_Base,
+
+      Categoria,
+      SubCategoria,
+      Moneda_Transaccion,
+      Cantidad,
+      Monto AS Monto_Transaccion,
+      0 AS Monto_Transaccion_MTD,
+      0 AS Monto_Transaccion_MTD_LY,
+      0 AS Monto_Transaccion_YTD,
+      0 AS Monto_Transaccion_YTD_LY,
+
+      Tipo_Cambio_MXN,
+      Monto_Conversion_MXN,
+      '' AS FCURR,
+      0 AS UKURS,
+      0 AS UKURS_MTD,
+      0 AS UKURS_MTD_LY,
+      0 AS UKURS_YTD,
+      0 AS UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Fact_Ventas`
+      WHERE Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= CAST({% date_start date_filter %} AS DATE)
+      UNION ALL
+
+      --CARGA TOTAL MXN México
+      SELECT
+      v.ID_Fuente,
+      '' AS Documento,
+      '' AS Posicion,
+      v.Tipo_Transaccion,
+      '' AS Tipo_Documento,
+      v.Fecha,
+      v.Canal_Distribucion,
+      '' AS Material,
+      v.Planta,
+      '' AS Cliente,
+      '' AS Destinatario,
+      '' AS Organizacion_Ventas,
+      '' AS Unidad_Base,
+      'TOTAL MXN' AS Categoria,
+      '' AS SubCategoria,
+      '' AS Moneda_Transaccion,
+      0 AS Cantidad,
+      SUM(v.Monto) AS Monto_Transaccion,
+      SUM(v.Monto) AS Monto_Transaccion_MTD,
+      SUM(v.Monto) AS Monto_Transaccion_MTD_LY,
+      SUM(v.Monto) AS Monto_Transaccion_YTD,
+      SUM(v.Monto) AS Monto_Transaccion_YTD_LY,
+
+      0 Tipo_Cambio_MXN,
+      0 Monto_Conversion_MXN,
+      '' AS FCURR,
+      0 AS UKURS,
+      0 AS UKURS_MTD,
+      0 AS UKURS_MTD_LY,
+      0 AS UKURS_YTD,
+      0 AS UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Fact_Ventas` v
+      WHERE v.Organizacion_Ventas IN ("MXF1", "MXFC")
+      AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+      UNION ALL
+
+      --CARGA TOTAL MXN que no es México
+      SELECT
+      v.ID_Fuente,
+      '' AS Documento,
+      '' AS Posicion,
+      v.Tipo_Transaccion,
+      '' AS Tipo_Documento,
+      v.Fecha,
+      v.Canal_Distribucion,
+      '' AS Material,
+      v.Planta,
+      '' AS Cliente,
+      '' AS Destinatario,
+      '' AS Organizacion_Ventas,
+      '' AS Unidad_Base,
+      'TOTAL MXN' AS Categoria,
+      '' AS SubCategoria,
+      '' AS Moneda_Transaccion,
+      0 AS Cantidad,
+      SUM( CASE
+      WHEN t.UKURS IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS
+      END ) AS Monto_Transaccion,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD
+      END ) AS Monto_Transaccion_MTD,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD_LY
+      END ) AS Monto_Transaccion_MTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD
+      END ) AS Monto_Transaccion_YTD,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD_LY
+      END ) AS Monto_Transaccion_YTD_LY,
+
+      0 Tipo_Cambio_MXN,
+      0 Monto_Conversion_MXN,
+      t.Moneda_Origen AS FCURR,
+      t.UKURS,
+      t.UKURS_MTD,
+      t.UKURS_MTD_LY,
+      t.UKURS_YTD,
+      t.UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Fact_Ventas` v left join (
+
+      SELECT
+      --ID_Fuente,
+      CAST({% date_start date_filter %} AS DATE) as Fecha,
+      Moneda_Origen,
+      Moneda_Conversion,
+
+      MAX(CASE
+      WHEN Fecha >= CAST({% date_start date_filter %} AS DATE)
+      AND Fecha <= CAST({% date_start date_filter %} AS DATE)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS,
+
+      AVG(CASE
+      WHEN Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD,
+
+      AVG(CASE
+      WHEN Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD_LY,
+
+      AVG(CASE
+      WHEN Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+      and  Fecha <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD,
+
+      AVG(CASE
+      WHEN Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      and  Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Dim_Divisas`
+      where Moneda_Origen IN ('USD', 'EUR', 'DKK', 'GTQ', 'CAD')
+      AND Moneda_Conversion IN ('MXN')
+      GROUP BY 1,2,3
+      ) t on v.Fecha = t.Fecha and v.Moneda_Transaccion = t.Moneda_Origen
+      WHERE v.Organizacion_Ventas NOT IN ("MXF1", "MXFC")
+      AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+
+      --CARGA TOTAL USD
+      UNION ALL
+      SELECT
+      v.ID_Fuente,
+      '' AS Documento,
+      '' AS Posicion,
+      v.Tipo_Transaccion,
+      '' AS Tipo_Documento,
+      v.Fecha,
+      v.Canal_Distribucion,
+      '' AS Material,
+      v.Planta,
+      '' AS Cliente,
+      '' AS Destinatario,
+      '' AS Organizacion_Ventas,
+      '' AS Unidad_Base,
+      'TOTAL USD' AS Categoria,
+      '' AS SubCategoria,
+      '' AS Moneda_Transaccion,
+      0 AS Cantidad,
+      SUM( CASE
+      WHEN t.UKURS IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS
+      END ) AS Monto_Transaccion,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD
+      END ) AS Monto_Transaccion_MTD,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD_LY
+      END ) AS Monto_Transaccion_MTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD
+      END ) AS Monto_Transaccion_YTD,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD_LY
+      END ) AS Monto_Transaccion_YTD_LY,
+
+      0 Tipo_Cambio_MXN,
+      0 Monto_Conversion_MXN,
+      '' AS FCURR,
+      0 AS UKURS,
+      0 AS UKURS_MTD,
+      0 AS UKURS_MTD_LY,
+      0 AS UKURS_YTD,
+      0 AS UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Fact_Ventas` v left join (
+
+      SELECT
+      --ID_Fuente,
+      CAST({% date_start date_filter %} AS DATE) as Fecha,
+      Moneda_Origen,
+      Moneda_Conversion,
+
+      MAX(CASE
+      WHEN Fecha >= CAST({% date_start date_filter %} AS DATE)
+      AND Fecha <= CAST({% date_start date_filter %} AS DATE)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS,
+
+      AVG(CASE
+      WHEN Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD,
+
+      AVG(CASE
+      WHEN Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD_LY,
+
+      AVG(CASE
+      WHEN Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+      and  Fecha <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD,
+
+      AVG(CASE
+      WHEN Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      and  Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Dim_Divisas`
+      where Moneda_Origen IN ('MXN', 'EUR', 'DKK', 'GTQ', 'CAD')
+      AND Moneda_Conversion IN ('USD')
+      GROUP BY 1,2,3
+      ) t on v.Fecha = t.Fecha and v.Moneda_Transaccion = t.Moneda_Origen
+      WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+      UNION ALL
+
+      --CARGA TOTAL EUR
+      SELECT
+      v.ID_Fuente,
+      '' AS Documento,
+      '' AS Posicion,
+      v.Tipo_Transaccion,
+      '' AS Tipo_Documento,
+      v.Fecha,
+      v.Canal_Distribucion,
+      '' AS Material,
+      v.Planta,
+      '' AS Cliente,
+      '' AS Destinatario,
+      '' AS Organizacion_Ventas,
+      '' AS Unidad_Base,
+      'TOTAL EUR' AS Categoria,
+      '' AS SubCategoria,
+      '' AS Moneda_Transaccion,
+      0 AS Cantidad,
+      SUM( CASE
+      WHEN t.UKURS IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS
+      END ) AS Monto_Transaccion,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD
+      END ) AS Monto_Transaccion_MTD,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD_LY
+      END ) AS Monto_Transaccion_MTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD
+      END ) AS Monto_Transaccion_YTD,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD_LY
+      END ) AS Monto_Transaccion_YTD_LY,
+
+      0 Tipo_Cambio_MXN,
+      0 Monto_Conversion_MXN,
+      '' AS FCURR,
+      0 AS UKURS,
+      0 AS UKURS_MTD,
+      0 AS UKURS_MTD_LY,
+      0 AS UKURS_YTD,
+      0 AS UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Fact_Ventas` v left join (
+
+      SELECT
+      --ID_Fuente,
+      CAST({% date_start date_filter %} AS DATE) as Fecha,
+      Moneda_Origen,
+      Moneda_Conversion,
+
+      MAX(CASE
+      WHEN Fecha >= CAST({% date_start date_filter %} AS DATE)
+      AND Fecha <= CAST({% date_start date_filter %} AS DATE)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS,
+
+      AVG(CASE
+      WHEN Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD,
+
+      AVG(CASE
+      WHEN Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD_LY,
+
+      AVG(CASE
+      WHEN Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+      and  Fecha <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD,
+
+      AVG(CASE
+      WHEN Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      and  Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Dim_Divisas`
+      where Moneda_Origen IN ('MXN', 'USD', 'DKK', 'GTQ', 'CAD')
+      AND Moneda_Conversion IN ('EUR')
+      GROUP BY 1,2,3
+      ) t on v.Fecha = t.Fecha and v.Moneda_Transaccion = t.Moneda_Origen
+      WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,24,25,26,27,28,29,30,31
+      ;;
   }
 
   dimension: id_fuente {
     hidden: yes
     type: string
-    sql: ${TABLE}.ID_FUENTE ;;
+    sql: ${TABLE}.ID_Fuente ;;
   }
 
   dimension: documento {
     hidden: yes
     type: string
-    sql: ${TABLE}.DOCUMENTO ;;
+    sql: ${TABLE}.Documento ;;
   }
 
   dimension: posicion {
     hidden: yes
     type: string
-    sql: ${TABLE}.POSICION ;;
+    sql: ${TABLE}.Posicion ;;
   }
 
   dimension: tipo_transaccion {
     type: string
-    sql: ${TABLE}.TIPO_TRANSACCION ;;
+    sql: ${TABLE}.Tipo_Transaccion ;;
   }
 
   dimension: tipo_documento {
     hidden: yes
     type: string
-    sql: ${TABLE}.TIPO_DOCUMENTO ;;
+    sql: ${TABLE}.Tipo_Documento ;;
   }
 
   dimension: fecha {
     hidden: yes
     type: date
-    sql: ${TABLE}.FECHA ;;
+    sql: ${TABLE}.Fecha ;;
   }
 
   dimension: canal_distribucion {
     type: string
-    sql: ${TABLE}.CANAL_DISTRIBUCION ;;
+    sql: ${TABLE}.Canal_Distribucion ;;
   }
 
   dimension: material {
     hidden: yes
     type: string
-    sql: ${TABLE}.MATERIAL ;;
+    sql: ${TABLE}.Material ;;
   }
 
   dimension: planta {
     hidden: yes
     type: string
-    sql: ${TABLE}.PLANTA ;;
+    sql: ${TABLE}.Planta ;;
   }
 
   dimension: cliente {
     hidden: yes
     type: string
-    sql: ${TABLE}.CLIENTE ;;
+    sql: ${TABLE}.Cliente ;;
   }
 
   dimension: destinatario {
     hidden: yes
     type: string
-    sql: ${TABLE}.DESTINATARIO ;;
+    sql: ${TABLE}.Destinatario ;;
   }
 
   dimension: organizacion_ventas {
     type: string
-    sql: ${TABLE}.ORGANIZACION_VENTAS ;;
-  }
-
-  dimension: oficina_ventas {
-    type: string
-    sql: ${TABLE}.OFICINA_VENTAS ;;
+    sql: ${TABLE}.Organizacion_Ventas ;;
   }
 
   dimension: unidad_base {
     type: string
-    sql: ${TABLE}.UNIDAD_BASE ;;
+    sql: ${TABLE}.Unidad_Base ;;
   }
-
 
   dimension: categoria {
     label: "CATEGORY"
     type: string
-    sql: ${TABLE}.CATEGORIA ;;
+    sql: ${TABLE}.Categoria ;;
 
     html: {% if value == 'TOTAL LOCAL CURRENCY USD' or
           value == 'TOTAL LOCAL CURRENCY DKK' or
@@ -264,7 +633,7 @@ view: ventas {
   dimension: orden_categoria {
     type: number
     sql: CASE
-         WHEN ${TABLE}.CATEGORIA NOT IN ('TOTAL USD', 'TOTAL EUR')
+         WHEN ${TABLE}.Categoria NOT IN ('TOTAL USD', 'TOTAL EUR', 'TOTAL MXN')
          THEN 10
          ELSE 200
          END ;;
@@ -273,36 +642,71 @@ view: ventas {
   dimension: subcategoria {
     label: "SUBCATEGORY"
     type: string
-    sql: ${TABLE}.SUBCATEGORIA ;;
+    sql: ${TABLE}.SubCategoria ;;
   }
 
   dimension: moneda_transaccion {
+    type: string
+    sql: ${TABLE}.Moneda_Transaccion ;;
+  }
+
+  #dimension: UKURS {
+  #  type: number
+  #  sql: ${TABLE}.UKURS ;;
+  #  value_format: "#,##0.00"
+  #}
+
+  dimension: FCURR {
     label: "CURRENCY TYPE"
     type: string
-    sql: ${TABLE}.MONEDA_TRANSACCION ;;
+    sql: ${TABLE}.FCURR ;;
   }
 
   dimension: cantidad {
     hidden: yes
     type: number
-    sql: ${TABLE}.CANTIDAD /1000 ;;
+    sql: ${TABLE}.Cantidad /1000 ;;
   }
 
   dimension: monto_transaccion {
     hidden: yes
     type: number
-    sql: ${TABLE}.MONTO_TRANSACCION /1000 ;;
+    sql: ${TABLE}.Monto_Transaccion /1000 ;;
+  }
+
+  dimension: monto_transaccion_mtd {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion_MTD /1000 ;;
+  }
+
+  dimension: monto_transaccion_mtd_ly {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion_MTD_LY /1000 ;;
+  }
+
+  dimension: monto_transaccion_ytd {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion_YTD /1000 ;;
+  }
+
+  dimension: monto_transaccion_ytd_ly {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion_YTD_LY /1000 ;;
   }
 
   dimension: tipo_cambio {
     type: number
-    sql: ${TABLE}.TIPO_CAMBIO ;;
+    sql: ${TABLE}.Tipo_Cambio_MXN ;;
   }
 
   dimension: monto_mxn {
     hidden: yes
     type: number
-    sql: ${TABLE}.MONTO_MXN /1000 ;;
+    sql: ${TABLE}.Monto_Conversion_MXN /1000 ;;
   }
 
   dimension: fecha_seleccionada {
@@ -391,9 +795,11 @@ view: ventas {
     sql:  CASE
            WHEN ${fecha} >= CAST({% date_start date_filter %} AS DATE)
            AND ${fecha} <= CAST({% date_start date_filter %} AS DATE)
-           THEN ${TABLE}.TIPO_CAMBIO
+           THEN ${TABLE}.UKURS
            ELSE 0
            END  ;;
+
+    value_format: "#,##0.00"
   }
 
   measure: daily_sales {
@@ -435,12 +841,72 @@ view: ventas {
 
   #MONTHLY-MONEY-MTD
 
+  measure: s_tipo_cambio_mtd {
+    group_label: "Monthly"
+    label: "EXCHANGE RATE MTD"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+           AND ${fecha} <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+           THEN ${TABLE}.UKURS_MTD
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
+
+  measure: s_tipo_cambio_mtd_ly {
+    group_label: "Monthly"
+    label: "EXCHANGE RATE MTD LY"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+           AND ${fecha} <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+           THEN ${TABLE}.UKURS_MTD_LY
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
+  measure: s_tipo_cambio_bud_mtd {
+    group_label: "Monthly"
+    label: "EXCHANGE RATE BUD MTD"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+           AND ${fecha} <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+           THEN ${TABLE}.UKURS_MTD*1.2
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
+  measure: s_tipo_cambio_bud_mtd_ly {
+    group_label: "Monthly"
+    label: "EXCHANGE RATE BUD MTD LY"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+           AND ${fecha} <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+           THEN ${TABLE}.UKURS_MTD_LY*1.2
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
   measure: national_amount_mtd {
     hidden: yes
     group_label: "Monthly"
     label: "NATIONAL AMOUNT MTD"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_mtd}
+         ELSE ${monto_transaccion} END ;;
 
     filters: {
       field: is_current_period
@@ -460,9 +926,14 @@ view: ventas {
     group_label: "Monthly"
     label: "EXPORT AMOUNT MTD"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_mtd}
+         ELSE ${monto_transaccion} END  ;;
+
     filters: [canal_distribucion: "EXPORTACION"]
     filters: [tipo_transaccion: "VENTA"]
+
     filters: {
       field: is_current_period
       value: "yes"
@@ -498,7 +969,10 @@ view: ventas {
     group_label: "Monthly"
     label: "NATIONAL AMOUNT MTD LY"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_mtd_ly}
+         ELSE ${monto_transaccion} END  ;;
 
     filters: {
       field: is_previous_period
@@ -519,7 +993,10 @@ view: ventas {
     label: "EXPORT AMOUNT MTD LY"
 
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_mtd_ly}
+         ELSE ${monto_transaccion} END ;;
 
     filters: {
       field: is_previous_period
@@ -575,7 +1052,10 @@ view: ventas {
     group_label: "Monthly"
     label: "Z NATIONAL AMOUNT BUD MTD"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_mtd} * 1.2
+         ELSE ${monto_transaccion} END ;;
 
     filters: {
       field: is_current_period
@@ -595,7 +1075,10 @@ view: ventas {
     label: "Z EXPORT AMOUNT BUD MTD"
 
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_mtd} * 1.2
+         ELSE ${monto_transaccion} END ;;
     filters: {
       field: is_current_period
       value: "yes"
@@ -844,12 +1327,72 @@ view: ventas {
 
   #ANNUAL-MONEY-YTD
 
+
+  measure: s_tipo_cambio_ytd {
+    group_label: "Annual"
+    label: "EXCHANGE RATE YTD"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+           and  ${fecha} <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+           THEN ${TABLE}.UKURS_YTD
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
+  measure: s_tipo_cambio_ytd_ly {
+    group_label: "Annual"
+    label: "EXCHANGE RATE YTD LY"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+    and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+           THEN ${TABLE}.UKURS_YTD_LY
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
+  measure: s_tipo_cambio_bud_ytd {
+    group_label: "Annual"
+    label: "EXCHANGE RATE BUD YTD"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+           and  ${fecha} <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+           THEN ${TABLE}.UKURS_YTD*1.2
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
+  measure: s_tipo_cambio_bud_ytd_ly {
+    group_label: "Annual"
+    label: "EXCHANGE RATE BUD YTD LY"
+    type: max
+    sql:  CASE
+           WHEN ${fecha} >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+    and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+           THEN ${TABLE}.UKURS_YTD_LY*1.2
+           ELSE 0
+           END  ;;
+
+    value_format: "#,##0.00"
+  }
+
   measure: national_amount_ytd {
     hidden: yes
     group_label: "Annual"
     label: "NATIONAL AMOUNT YTD"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_ytd}
+         ELSE ${monto_transaccion} END ;;
 
     filters: {
       field: is_current_year
@@ -869,7 +1412,11 @@ view: ventas {
     group_label: "Annual"
     label: "EXPORT AMOUNT YTD"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_ytd}
+         ELSE ${monto_transaccion} END ;;
+
     filters: [canal_distribucion: "EXPORTACION"]
     filters: [tipo_transaccion: "VENTA"]
     filters: {
@@ -899,7 +1446,10 @@ view: ventas {
     group_label: "Annual"
     label: "NATIONAL AMOUNT YTD LY"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_ytd_ly}
+         ELSE ${monto_transaccion} END ;;
 
     filters: {
       field: is_previous_year
@@ -920,7 +1470,10 @@ view: ventas {
     label: "EXPORT AMOUNT YTD LY"
 
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+         WHEN ${categoria} LIKE '%TOTAL%'
+         THEN ${monto_transaccion_ytd_ly}
+         ELSE ${monto_transaccion} END ;;
 
     filters: {
       field: is_previous_year
@@ -976,7 +1529,10 @@ view: ventas {
     group_label: "Annual"
     label: "Z NATIONAL AMOUNT BUD YTD"
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+             WHEN ${categoria} LIKE '%TOTAL%'
+             THEN ${monto_transaccion_ytd} * 1.2
+             ELSE ${monto_transaccion} END ;;
 
     filters: {
       field: is_current_year
@@ -996,7 +1552,11 @@ view: ventas {
     label: "Z EXPORT AMOUNT BUD YTD"
 
     type: sum
-    sql: ${monto_transaccion} ;;
+    sql: CASE
+             WHEN ${categoria} LIKE '%TOTAL%'
+             THEN ${monto_transaccion_ytd} * 1.2
+             ELSE ${monto_transaccion} END ;;
+
     filters: {
       field: is_current_year
       value: "yes"

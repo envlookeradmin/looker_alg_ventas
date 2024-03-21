@@ -1,28 +1,21 @@
 view: grupo_cliente {
-  derived_table: {
-    sql:
-       SELECT
-        ID_FUENTE,
-        GRUPO_CLIENTES,
-        DESCRIPCION
-        FROM `envases-analytics-qa.RPT_ALG_MOCK.tbl_alg_dim_grupo_clientes`
-       ;;
-  }
+
+  sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_GrupoClientes`;;
 
 
   dimension: id_fuente {
     type: string
-    sql: ${TABLE}.ID_FUENTE;;
+    sql: ${TABLE}.ID_Fuente;;
   }
 
-  dimension: grupo_cliente {
+  dimension: codigo_grupo {
     type: string
-    sql: ${TABLE}.GRUPO_CLIENTES ;;
+    sql: ${TABLE}.Codigo_Grupo ;;
   }
 
   dimension: descripcion {
     type: string
-    sql: ${TABLE}.DESCRIPCION ;;
+    sql: ${TABLE}.Descripcion ;;
   }
 
 }
