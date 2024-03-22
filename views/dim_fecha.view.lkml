@@ -36,12 +36,6 @@ view: fecha {
     sql: ${TABLE}.DAY ;;
   }
 
-  dimension: nombre_mes {
-    type: string
-    sql:  ${TABLE}.MONTH_NAME_SP;;
-    order_by_field: date_month
-  }
-
   dimension: trimestre {
     type: number
     sql: ${TABLE}.QUARTER ;;

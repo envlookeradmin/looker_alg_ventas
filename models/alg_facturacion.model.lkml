@@ -32,7 +32,8 @@ explore: ventas {
     sql_on: ${ventas.codigo_cliente} = ${cliente.codigo_cliente}
             and ${ventas.id_fuente} = ${cliente.id_fuente}
             and ${ventas.organizacion_ventas} = ${cliente.organizacion_ventas}
-            and ${ventas.codigo_canal_distribucion} = ${cliente.codigo_canal_distribucion};;
+            and ${ventas.codigo_canal_distribucion} = ${cliente.codigo_canal_distribucion}
+            and ${ventas.division} = ${cliente.division};;
     relationship: many_to_one
   }
 
