@@ -58,10 +58,10 @@ explore: ventas {
     relationship: many_to_one
   }
 
-  access_filter: {
-    field: planta.cluster
-    user_attribute: alg_cluster
-  }
+  #access_filter: {
+  #  field: planta.cluster
+  #  user_attribute: alg_cluster
+  #}
 
   #access_filter: {
   #  field: planta.pais
