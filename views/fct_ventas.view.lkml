@@ -974,7 +974,9 @@ view: ventas {
 
           when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
           when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          else "Z03"
+          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
+          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
+          --else "Z03"
           end
 
          when ${planta.cluster} = 'USA' then
@@ -985,8 +987,10 @@ view: ventas {
           when ${TABLE}.Categoria="Varios." then "A04"
 
           when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z02"
-          else "Z03"
+          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
+          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
+          --else "Z03"
         end
 
         when ${planta.cluster} = 'ECN - North' then
@@ -1018,8 +1022,10 @@ view: ventas {
           when ${TABLE}.Categoria="Other" then "a22"
 
           when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z02"
-          else "Z03"
+          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
+          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
+          --else "Z03"
         end
 
         when ${planta.cluster} = 'ECC - Central' then
@@ -1062,8 +1068,10 @@ view: ventas {
 
 
           when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z02"
-          else "Z03"
+          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
+          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
+          --else "Z03"
         end
 
         when ${planta.cluster} = "ECS - South" then
@@ -1110,8 +1118,10 @@ view: ventas {
           when ${TABLE}.Categoria="Print and Coating Services" then "a36"
 
           when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z02"
-          else "Z03"
+          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
+          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
+          --else "Z03"
         end
 
         when ${planta.cluster} = "ECW - West" then
@@ -1125,8 +1135,10 @@ view: ventas {
           when ${TABLE}.Categoria="Pails and lids for pails" then "a06"
 
           when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z02"
-          else "Z03"
+          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
+          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
+          --else "Z03"
         end
 
       when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
