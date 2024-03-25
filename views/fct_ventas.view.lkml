@@ -780,7 +780,7 @@ view: ventas {
   dimension: canal_distribucion {
     type: string
     sql: CASE
-          WHEN ${TABLE}.Canal_Distribucion IN ('00','10','50') THEN 'Nacional'
+          WHEN ${TABLE}.Canal_Distribucion IN ('00','10','50','80') THEN 'Nacional'
           ELSE 'Exportacion'
           END ;;
   }
