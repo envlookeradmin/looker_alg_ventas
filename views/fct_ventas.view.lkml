@@ -60,10 +60,10 @@ view: ventas {
       v.Canal_Distribucion,
       '' AS Material,
       v.Planta,
-      '' AS Cliente,
+      v.Cliente,
       '' AS Destinatario,
-      '' AS Organizacion_Ventas,
-      '' AS Division,
+      v.Organizacion_Ventas,
+      v.Division,
       '' AS Unidad_Base,
       'TOTAL MXN' AS Categoria,
       '' AS SubCategoria,
@@ -109,10 +109,10 @@ view: ventas {
       v.Canal_Distribucion,
       '' AS Material,
       v.Planta,
-      '' AS Cliente,
+      v.Cliente,
       '' AS Destinatario,
-      '' AS Organizacion_Ventas,
-      '' AS Division,
+      v.Organizacion_Ventas,
+      v.Division,
       '' AS Unidad_Base,
       'TOTAL MXN' AS Categoria,
       '' AS SubCategoria,
@@ -322,10 +322,10 @@ view: ventas {
       v.Canal_Distribucion,
       '' AS Material,
       v.Planta,
-      '' AS Cliente,
+      v.Cliente,
       '' AS Destinatario,
-      '' AS Organizacion_Ventas,
-      '' AS Division,
+      v.Organizacion_Ventas,
+      v.Division,
       '' AS Unidad_Base,
       'TOTAL USD' AS Categoria,
       '' AS SubCategoria,
@@ -534,12 +534,436 @@ view: ventas {
       v.Canal_Distribucion,
       '' AS Material,
       v.Planta,
-      '' AS Cliente,
+      v.Cliente,
       '' AS Destinatario,
-      '' AS Organizacion_Ventas,
-      '' AS Division,
+      v.Organizacion_Ventas,
+      v.Division,
       '' AS Unidad_Base,
       'TOTAL EUR' AS Categoria,
+      '' AS SubCategoria,
+      '' AS Moneda_Transaccion,
+      0 AS Cantidad,
+      SUM( CASE
+      WHEN t.UKURS IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS
+      END ) AS Monto_Transaccion,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD
+      END ) AS Monto_Transaccion_MTD,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD_LY
+      END ) AS Monto_Transaccion_MTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD
+      END ) AS Monto_Transaccion_YTD,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD_LY
+      END ) AS Monto_Transaccion_YTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_MTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_MTD
+      END ) AS Monto_Transaccion_Bud_MTD,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_MTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_MTD_LY
+      END ) AS Monto_Transaccion_Bud_MTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_YTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_YTD
+      END ) AS Monto_Transaccion_Bud_YTD,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_YTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_YTD_LY
+      END ) AS Monto_Transaccion_Bud_YTD_LY,
+
+      0 Tipo_Cambio_MXN,
+      0 Monto_Conversion_MXN,
+      '' AS FCURR,
+      0 AS UKURS,
+      0 AS UKURS_MTD,
+      0 AS UKURS_MTD_LY,
+      0 AS UKURS_YTD,
+      0 AS UKURS_YTD_LY,
+      0 AS UKURS_BUD_MTD,
+      0 AS UKURS_BUD_MTD_LY,
+      0 AS UKURS_BUD_YTD,
+      0 AS UKURS_BUD_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Fact_Ventas` v left join (
+
+      SELECT
+      --ID_Fuente,
+      CAST({% date_start date_filter %} AS DATE) as Fecha,
+      Moneda_Origen,
+      Moneda_Conversion,
+
+      MAX(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= CAST({% date_start date_filter %} AS DATE)
+      AND Fecha <= CAST({% date_start date_filter %} AS DATE)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD_LY,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD_LY,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_MTD,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_MTD_LY,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_YTD,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_YTD_LY
+
+      FROM `envases-analytics-qa.RPT_ALG.Dim_Divisas`
+      where Moneda_Origen IN ('MXN', 'USD', 'DKK', 'GTQ', 'CAD')
+      AND Moneda_Conversion IN ('EUR')
+      GROUP BY 1,2,3
+      ) t on v.Fecha = t.Fecha and v.Moneda_Transaccion = t.Moneda_Origen
+      WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,28,29,30,31,32,33,34,35,36,37,38,39
+
+    --CARGA SUBTOTAL USD
+      UNION ALL
+      SELECT
+      v.ID_Fuente,
+      '' AS Documento,
+      '' AS Posicion,
+      v.Tipo_Transaccion,
+      '' AS Tipo_Documento,
+      v.Fecha,
+      v.Canal_Distribucion,
+      '' AS Material,
+      v.Planta,
+      v.Cliente,
+      '' AS Destinatario,
+      v.Organizacion_Ventas,
+      v.Division,
+      '' AS Unidad_Base,
+      'SUBTOTAL USD' AS Categoria,
+      '' AS SubCategoria,
+      '' AS Moneda_Transaccion,
+      0 AS Cantidad,
+      SUM( CASE
+      WHEN t.UKURS IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS
+      END ) AS Monto_Transaccion,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD
+      END ) AS Monto_Transaccion_MTD,
+
+      SUM( CASE
+      WHEN t.UKURS_MTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_MTD_LY
+      END ) AS Monto_Transaccion_MTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD
+      END ) AS Monto_Transaccion_YTD,
+
+      SUM( CASE
+      WHEN t.UKURS_YTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_YTD_LY
+      END ) AS Monto_Transaccion_YTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_MTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_MTD
+      END ) AS Monto_Transaccion_Bud_MTD,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_MTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_MTD_LY
+      END ) AS Monto_Transaccion_Bud_MTD_LY,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_YTD IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_YTD
+      END ) AS Monto_Transaccion_Bud_YTD,
+
+      SUM( CASE
+      WHEN t.UKURS_BUD_YTD_LY IS NULL
+      THEN v.Monto
+      ELSE v.Monto * t.UKURS_BUD_YTD_LY
+      END ) AS Monto_Transaccion_Bud_YTD_LY,
+
+      0 Tipo_Cambio_MXN,
+      0 Monto_Conversion_MXN,
+      '' AS FCURR,
+      0 AS UKURS,
+      0 AS UKURS_MTD,
+      0 AS UKURS_MTD_LY,
+      0 AS UKURS_YTD,
+      0 AS UKURS_YTD_LY,
+      0 AS UKURS_BUD_MTD,
+      0 AS UKURS_BUD_MTD_LY,
+      0 AS UKURS_BUD_YTD,
+      0 AS UKURS_BUD_YTD_LY
+      FROM `envases-analytics-qa.RPT_ALG.Fact_Ventas` v left join (
+
+      SELECT
+      --ID_Fuente,
+      CAST({% date_start date_filter %} AS DATE) as Fecha,
+      Moneda_Origen,
+      Moneda_Conversion,
+
+      MAX(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= CAST({% date_start date_filter %} AS DATE)
+      AND Fecha <= CAST({% date_start date_filter %} AS DATE)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_MTD_LY,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD,
+
+      AVG(CASE
+      WHEN Presupuesto = false
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_YTD_LY,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST({% date_start date_filter %} AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD((CAST({% date_start date_filter %} AS DATE)),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_MTD,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
+      AND Fecha <= DATE_ADD(   DATE_ADD( CAST({% date_start date_filter %} AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_MTD_LY,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_YTD,
+
+      AVG(CASE
+      WHEN Presupuesto = true
+      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
+      THEN CAST(
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END
+      AS NUMERIC) END ) as UKURS_BUD_YTD_LY
+
+      FROM `envases-analytics-qa.RPT_ALG.Dim_Divisas`
+      where Moneda_Origen IN ('MXN', 'EUR', 'DKK', 'GTQ', 'CAD')
+      AND Moneda_Conversion IN ('USD')
+      GROUP BY 1,2,3
+      ) t on v.Fecha = t.Fecha and v.Moneda_Transaccion = t.Moneda_Origen
+      WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
+      AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,28,29,30,31,32,33,34,35,36,37,38,39
+      UNION ALL
+
+      --CARGA SUBTOTAL EUR
+      SELECT
+      v.ID_Fuente,
+      '' AS Documento,
+      '' AS Posicion,
+      v.Tipo_Transaccion,
+      '' AS Tipo_Documento,
+      v.Fecha,
+      v.Canal_Distribucion,
+      '' AS Material,
+      v.Planta,
+      v.Cliente,
+      '' AS Destinatario,
+      v.Organizacion_Ventas,
+      v.Division,
+      '' AS Unidad_Base,
+      'SUBTOTAL EUR' AS Categoria,
       '' AS SubCategoria,
       '' AS Moneda_Transaccion,
       0 AS Cantidad,
@@ -736,6 +1160,8 @@ view: ventas {
       ;;
   }
 
+
+
   dimension: id_fuente {
     hidden: yes
     type: string
@@ -824,6 +1250,56 @@ view: ventas {
     sql: ${TABLE}.Unidad_Base ;;
   }
 
+  dimension: cluster_resumen {
+    label: "CLUSTER"
+    type: string
+    sql: CASE
+           WHEN ${categoria} = 'SUBTOTAL USD' AND ${planta.region} = 'Americas' THEN 'SUB America (USD)'
+           WHEN ${categoria} = 'SUBTOTAL EUR' and ${planta.region} = 'Europa' THEN 'SUB Europa (EUR)'
+           WHEN ${categoria} = 'TOTAL USD' THEN 'TOTAL USD'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'Mexico' THEN 'Mexico (MXN)'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'USA' THEN 'USA (USD)'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'Canada' THEN 'Canada (CAD)'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'Guatemala' THEN 'Guatemala (GTQ)'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECN - North' THEN 'ECN - North (DKK)'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECC - Central' THEN 'ECC - Central (EUR)'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECW - West' THEN 'ECW - West (EUR)'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECS - South' THEN 'ECS - South (EUR)'
+         END ;;
+
+    html: {% if value == 'TOTAL MXN' or
+    value == 'TOTAL USD' or
+    value == 'TOTAL EUR'
+    %}
+    <p style="color: white; background-color: #5e2129; font-size:100%; text-align:left">{{ rendered_value }}</p>
+    {% elsif value == 'SUB America (USD)' or
+      value == 'SUB Europa (EUR)'
+      %}
+    <p style="color: white; background-color: #ab716f; font-size:100%; text-align:left">{{ rendered_value }}</p>
+    {% else %}
+    <p style="">{{ rendered_value }}</p>
+    {% endif %} ;;
+
+    order_by_field: orden_cluster_resumen
+  }
+
+  dimension: orden_cluster_resumen {
+    type: string
+    sql: CASE
+           WHEN ${categoria} = 'SUBTOTAL USD' AND ${planta.region} = 'Americas' THEN 'A05'
+           WHEN ${categoria} = 'SUBTOTAL EUR' and ${planta.region} = 'Europa' THEN 'A10'
+           WHEN ${categoria} = 'TOTAL USD' THEN 'Z10'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'Mexico' THEN 'A01'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'USA' THEN 'A02'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'Canada' THEN 'A03'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'Guatemala' THEN 'A04'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECN - North' THEN 'A06'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECC - Central' THEN 'A07'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECW - West' THEN 'A08'
+           WHEN ${categoria} NOT IN ('TOTAL USD','TOTAL MXN','TOTAL EUR','SUBTOTAL USD','SUBTOTAL EUR') AND ${planta.cluster} = 'ECS - South' THEN 'A09'
+         END ;;
+  }
+
   dimension: categoria {
     label: "CATEGORY"
     type: string
@@ -908,7 +1384,7 @@ view: ventas {
       <p style="">{{ rendered_value }}</p>
       {% endif %} ;;
 
-    order_by_field: orden_categoria
+    #order_by_field: orden_categoria
   }
 
   dimension: orden_categoria {
@@ -977,9 +1453,9 @@ view: ventas {
           when ${TABLE}.Categoria="TOTAL USD" then "Z03"
           when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
           --else "Z03"
-          end
+        end
 
-         when ${planta.cluster} = 'USA' then
+      when ${planta.cluster} = 'USA' then
         case
           when ${TABLE}.Categoria="Bote Pint. Envases Ohio" then "A01"
           when ${TABLE}.Categoria="Cub.Lam. Envases Ohio" then "A02"
@@ -993,7 +1469,7 @@ view: ventas {
           --else "Z03"
         end
 
-        when ${planta.cluster} = 'ECN - North' then
+      when ${planta.cluster} = 'ECN - North' then
 
         case
           when ${TABLE}.Categoria="Mediapack" then "a01"
@@ -1028,7 +1504,7 @@ view: ventas {
           --else "Z03"
         end
 
-        when ${planta.cluster} = 'ECC - Central' then
+      when ${planta.cluster} = 'ECC - Central' then
 
         case
 
@@ -1074,7 +1550,7 @@ view: ventas {
           --else "Z03"
         end
 
-        when ${planta.cluster} = "ECS - South" then
+      when ${planta.cluster} = "ECS - South" then
 
         case
           when ${TABLE}.Categoria="Fish - 1/2 Oval" then "a01"
@@ -1124,7 +1600,7 @@ view: ventas {
           --else "Z03"
         end
 
-        when ${planta.cluster} = "ECW - West" then
+      when ${planta.cluster} = "ECW - West" then
 
         case
           when ${TABLE}.Categoria="Coating and Printing Services" then "a01"
@@ -1141,20 +1617,263 @@ view: ventas {
           --else "Z03"
         end
 
-      when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-      when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-      when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-      when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
+          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
+          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
+          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
 
-    end
-    ;;
+      end
+      ;;
   }
 
   dimension: subcategoria {
     label: "SUBCATEGORY"
     type: string
     sql: ${TABLE}.SubCategoria ;;
+
+    #order_by_field: orden_subcategoria
   }
+
+
+  dimension: orden_subcategoria {
+    type: string
+    sql:
+    case
+      when ${planta.cluster} = 'Mexico' then
+        case
+          when ${TABLE}.SubCategoria="CP 10L" then "A03"
+          when ${TABLE}.SubCategoria="CP 15L" then "A02"
+          when ${TABLE}.SubCategoria="CP 08L" then "A04"
+          when ${TABLE}.SubCategoria="CP 19L" then "A01"
+          when ${TABLE}.SubCategoria="CP 04L" then "A05"
+          when ${TABLE}.SubCategoria="Cubeta de Plastico" then "A06"
+          when ${TABLE}.SubCategoria="Porron de Plastico" then "A07"
+          when ${TABLE}.SubCategoria="Tambores de Plastico" then "A08"
+          when ${TABLE}.SubCategoria="Bote Bocan" then "A09"
+          when ${TABLE}.SubCategoria="Tambores" then "A10"
+          when ${TABLE}.SubCategoria="Tambores Conicos" then "A11"
+          when ${TABLE}.SubCategoria="Cubeta de Lamina" then "A12"
+          when ${TABLE}.SubCategoria="Alcoholero" then "A13"
+          when ${TABLE}.SubCategoria="Bote de Pintura" then "A14"
+          when ${TABLE}.SubCategoria="Bote de Aerosol" then "A15"
+          when ${TABLE}.SubCategoria="Línea General" then "A16"
+          when ${TABLE}.SubCategoria="Bote Sanitario" then "A17"
+          when ${TABLE}.SubCategoria="Bote Atun" then "A18"
+          when ${TABLE}.SubCategoria="Bote Oval" then "A19"
+          when ${TABLE}.SubCategoria="Tapa Easy Open" then "A20"
+          when ${TABLE}.SubCategoria="Fondo Charola y Bafle" then "A21"
+          when ${TABLE}.SubCategoria="Tapa Twiss Off" then "A22"
+          when ${TABLE}.SubCategoria="Varios" then "A23"
+          when ${TABLE}.SubCategoria="Fish." then "A24"
+          when ${TABLE}.SubCategoria="PeelOff" then "A25"
+
+          when ${TABLE}.SubCategoria="Coating and Printing Services" then "A26"
+          when ${TABLE}.SubCategoria="Miscelaneous" then "A27"
+          when ${TABLE}.SubCategoria="Pails and lids for pails" then "A28"
+          when ${TABLE}.SubCategoria="Tinplate and lids for tinplate" then "A29"
+
+          when ${TABLE}.SubCategoria="Beverage Draught" then "A30"
+          when ${TABLE}.SubCategoria="Beverage Gravity" then "A31"
+          when ${TABLE}.SubCategoria="Industrial" then "A32"
+          when ${TABLE}.SubCategoria="SC Print" then "A33"
+
+          when ${TABLE}.SubCategoria="Bote de Aerosol GT" then "A34"
+          when ${TABLE}.SubCategoria="Bote de Pintura GT" then "A35"
+          when ${TABLE}.SubCategoria="Bote Sanitario GT" then "A36"
+          when ${TABLE}.SubCategoria="Varios GT" then "A37"
+          when ${TABLE}.SubCategoria="Cubeta de Lamina GT" then "A38"
+
+          when ${TABLE}.SubCategoria="Bote Pint. Envases Ohio" then "A39"
+          when ${TABLE}.SubCategoria="Cub.Lam. Envases Ohio" then "A40"
+          when ${TABLE}.SubCategoria="F-style" then "A43"
+          when ${TABLE}.SubCategoria="Varios." then "A44"
+
+          when ${TABLE}.SubCategoria="Bote Sanitario CA" then "A41"
+          when ${TABLE}.SubCategoria="Tapa Easy Open CA" then "A42"
+
+          when ${TABLE}.SubCategoria="Food" then "B01"
+          when ${TABLE}.SubCategoria="Fish" then "B02"
+          when ${TABLE}.SubCategoria="Print and Coating Services" then "B03"
+
+
+          when ${TABLE}.SubCategoria LIKE "TOTAL LOCAL%" then "Z01"
+          when ${TABLE}.SubCategoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.SubCategoria="TOTAL USD" then "Z03"
+          when ${TABLE}.SubCategoria="TOTAL EUR" then "Z04"
+          --else "Z03"
+      end
+
+      when ${planta.cluster} = 'USA' then
+        case
+          when ${TABLE}.SubCategoria="Bote Pint. Envases Ohio" then "A01"
+          when ${TABLE}.SubCategoria="Cub.Lam. Envases Ohio" then "A02"
+          when ${TABLE}.SubCategoria="F-style" then "A03"
+          when ${TABLE}.SubCategoria="Varios." then "A04"
+
+          when ${TABLE}.SubCategoria LIKE "TOTAL LOCAL%" then "Z01"
+          when ${TABLE}.SubCategoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.SubCategoria="TOTAL USD" then "Z03"
+          when ${TABLE}.SubCategoria="TOTAL EUR" then "Z04"
+          --else "Z03"
+        end
+
+      when ${planta.cluster} = 'ECN - North' then
+
+        case
+          when ${TABLE}.SubCategoria="Mediapack" then "a01"
+          when ${TABLE}.SubCategoria="Catering" then "a02"
+
+          when ${TABLE}.SubCategoria="Club (Alu)" then "a03"
+          when ${TABLE}.SubCategoria="Club (Steel)" then "a04"
+          when ${TABLE}.SubCategoria="Hansa" then "a05"
+          when ${TABLE}.SubCategoria="Dingley" then "a06"
+          when ${TABLE}.SubCategoria="Round Fish" then "a07"
+          when ${TABLE}.SubCategoria="Fish - Other" then "a08"
+          when ${TABLE}.SubCategoria="Fish" then "a09"
+
+          when ${TABLE}.SubCategoria="Ham" then "a10"
+          when ${TABLE}.SubCategoria="Luncheon" then "a11"
+          when ${TABLE}.SubCategoria="Pullman" then "a12"
+          when ${TABLE}.SubCategoria="Roundfood" then "a13"
+          when ${TABLE}.SubCategoria="Beverage" then "a14"
+          when ${TABLE}.SubCategoria="Cookie" then "a15"
+          when ${TABLE}.SubCategoria="Feta" then "a16"
+          when ${TABLE}.SubCategoria="Milkpowder" then "a17"
+          when ${TABLE}.SubCategoria="PockIt" then "a18"
+          when ${TABLE}.SubCategoria="PeelOff" then "a19"
+          when ${TABLE}.SubCategoria="Super" then "a20"
+          when ${TABLE}.SubCategoria="Cookie" then "a21"
+          when ${TABLE}.SubCategoria="Other" then "a22"
+
+          when ${TABLE}.SubCategoria LIKE "TOTAL LOCAL%" then "Z01"
+          when ${TABLE}.SubCategoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.SubCategoria="TOTAL USD" then "Z03"
+          when ${TABLE}.SubCategoria="TOTAL EUR" then "Z04"
+          --else "Z03"
+        end
+
+      when ${planta.cluster} = 'ECC - Central' then
+
+        case
+
+          when ${TABLE}.SubCategoria="Draught Kegs" then "a01"
+          when ${TABLE}.SubCategoria="Gravity Kegs" then "a02"
+          when ${TABLE}.SubCategoria="Beverage Miscellaneous" then "a03"
+          when ${TABLE}.SubCategoria="Beverage" then "a04"
+
+          when ${TABLE}.SubCategoria="Tin Cans" then "a05"
+          when ${TABLE}.SubCategoria="Vacuum Ink" then "a06"
+          when ${TABLE}.SubCategoria="Pails" then "a07"
+          when ${TABLE}.SubCategoria="Hobbocks" then "a08"
+          when ${TABLE}.SubCategoria="Square" then "a09"
+          when ${TABLE}.SubCategoria="Miscellaneous" then "a10"
+          when ${TABLE}.SubCategoria="Plastic" then "a11"
+          when ${TABLE}.SubCategoria="Industrial - Others" then "a12"
+          when ${TABLE}.SubCategoria="Industrial" then "a13"
+          when ${TABLE}.SubCategoria="SC Print" then "a14"
+
+          when ${TABLE}.SubCategoria="Draught - Cans" then "a01"
+          when ${TABLE}.SubCategoria="Draught - Miscellaneous" then "a02"
+          when ${TABLE}.SubCategoria="Beverage Draught" then "a03"
+          when ${TABLE}.SubCategoria="Gravity - Cans" then "a04"
+          when ${TABLE}.SubCategoria="Gravity - Miscellaneous" then "a05"
+          when ${TABLE}.SubCategoria="Beverage Gravity" then "a06"
+          when ${TABLE}.SubCategoria="Tin Cans" then "a07"
+          when ${TABLE}.SubCategoria="Cans" then "a08"
+          when ${TABLE}.SubCategoria="Vacuum Ink" then "a09"
+          when ${TABLE}.SubCategoria="Pails" then "a10"
+          when ${TABLE}.SubCategoria="Hobbocks" then "a11"
+          when ${TABLE}.SubCategoria="Square" then "a12"
+          when ${TABLE}.SubCategoria="Miscellaneous" then "a13"
+          when ${TABLE}.SubCategoria="Plastic" then "a14"
+          when ${TABLE}.SubCategoria="Industrial - Others" then "a15"
+          when ${TABLE}.SubCategoria="Industrial" then "a16"
+          when ${TABLE}.SubCategoria="SC Print" then "a17"
+
+
+          when ${TABLE}.SubCategoria LIKE "TOTAL LOCAL%" then "Z01"
+          when ${TABLE}.SubCategoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.SubCategoria="TOTAL USD" then "Z03"
+          when ${TABLE}.SubCategoria="TOTAL EUR" then "Z04"
+          --else "Z03"
+        end
+
+      when ${planta.cluster} = "ECS - South" then
+
+        case
+          when ${TABLE}.SubCategoria="Fish - 1/2 Oval" then "a01"
+          when ${TABLE}.SubCategoria="Fish - 1/4 Oval" then "a02"
+          when ${TABLE}.SubCategoria="Fish - 127" then "a03"
+          when ${TABLE}.SubCategoria="Fish - 150" then "a04"
+          when ${TABLE}.SubCategoria="Fish - 153" then "a05"
+          when ${TABLE}.SubCategoria="Fish - 65" then "a06"
+          when ${TABLE}.SubCategoria="Fish - 73" then "a07"
+          when ${TABLE}.SubCategoria="Fish - 83" then "a08"
+          when ${TABLE}.SubCategoria="Fish - 99" then "a09"
+          when ${TABLE}.SubCategoria="Fish - Anchoas" then "a10"
+          when ${TABLE}.SubCategoria="Fish - Club" then "a11"
+          when ${TABLE}.SubCategoria="Fish - Goods for Resale" then "a12"
+          when ${TABLE}.SubCategoria="Fish - Others" then "a13"
+          when ${TABLE}.SubCategoria="Fish - Pails" then "a14"
+          when ${TABLE}.SubCategoria="Fish - RR90" then "a15"
+          when ${TABLE}.SubCategoria="Fish" then "a16"
+
+          when ${TABLE}.SubCategoria="Vegetables - 153" then "a17"
+          when ${TABLE}.SubCategoria="Vegetables - 65" then "a18"
+          when ${TABLE}.SubCategoria="Vegetables - 73" then "a19"
+          when ${TABLE}.SubCategoria="Vegetables - 83" then "a20"
+          when ${TABLE}.SubCategoria="Vegetables - 99" then "a21"
+          when ${TABLE}.SubCategoria="Vegetables - Club" then "a22"
+          when ${TABLE}.SubCategoria="Vegetables - Goods for Resale" then "a23"
+          when ${TABLE}.SubCategoria="Vegetables - Others" then "a24"
+          when ${TABLE}.SubCategoria="Vegetables" then "a25"
+
+          when ${TABLE}.SubCategoria="Industrial - 73" then "a26"
+          when ${TABLE}.SubCategoria="Industrial - 99" then "a27"
+          when ${TABLE}.SubCategoria="Industrial - General Line" then "a28"
+          when ${TABLE}.SubCategoria="Industrial - Goods for Resale" then "a29"
+          when ${TABLE}.SubCategoria="Industrial - Others" then "a30"
+          when ${TABLE}.SubCategoria="Industrial - Pails" then "a31"
+          when ${TABLE}.SubCategoria="Industrial" then "a32"
+
+          when ${TABLE}.SubCategoria="Print and Coating Services - Goods for Resale" then "a33"
+          when ${TABLE}.SubCategoria="Print and Coating Services - Others" then "a34"
+          when ${TABLE}.SubCategoria="Print and Coating Services - Pails" then "a35"
+          when ${TABLE}.SubCategoria="Print and Coating Services" then "a36"
+
+          when ${TABLE}.SubCategoria LIKE "TOTAL LOCAL%" then "Z01"
+          when ${TABLE}.SubCategoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.SubCategoria="TOTAL USD" then "Z03"
+          when ${TABLE}.SubCategoria="TOTAL EUR" then "Z04"
+          --else "Z03"
+        end
+
+      when ${planta.cluster} = "ECW - West" then
+
+        case
+          when ${TABLE}.SubCategoria="Coating and Printing Services" then "a01"
+          when ${TABLE}.SubCategoria="Tin cans and closures for tin cans" then "a02"
+          when ${TABLE}.SubCategoria="Vegetables" then "a03"
+          when ${TABLE}.SubCategoria="Industrial" then "a04"
+          when ${TABLE}.SubCategoria="Miscelaneous" then "a05"
+          when ${TABLE}.SubCategoria="Pails and lids for pails" then "a06"
+
+          when ${TABLE}.SubCategoria LIKE "TOTAL LOCAL%" then "Z01"
+          when ${TABLE}.SubCategoria="TOTAL MXN" then "Z02"
+          when ${TABLE}.SubCategoria="TOTAL USD" then "Z03"
+          when ${TABLE}.SubCategoria="TOTAL EUR" then "Z04"
+          --else "Z03"
+        end
+
+        when ${TABLE}.SubCategoria LIKE "TOTAL LOCAL%" then "Z01"
+        when ${TABLE}.SubCategoria="TOTAL MXN" then "Z02"
+        when ${TABLE}.SubCategoria="TOTAL USD" then "Z03"
+        when ${TABLE}.SubCategoria="TOTAL EUR" then "Z04"
+
+      end
+      ;;
+  }
+
 
   dimension: moneda_transaccion {
     type: string
@@ -1333,6 +2052,18 @@ view: ventas {
       and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)   ;;
   }
 
+  dimension: filtro_real {
+    hidden: yes
+    type: yesno
+    sql: ${tipo_cambio.presupuesto} = 0 ;;
+  }
+
+  dimension: filtro_presupuesto {
+    hidden: yes
+    type: yesno
+    sql: ${tipo_cambio.presupuesto} = 1 ;;
+  }
+
   #metricas
 
   measure: empty_value1 {
@@ -1361,6 +2092,36 @@ view: ventas {
     sql: ${TABLE}.UKURS;;
 
     value_format: "#,##0.00"
+  }
+
+  measure: tipo_cambio_diario {
+    type: max
+    sql: ${tipo_cambio.tipo_cambio} ;;
+
+    filters: {
+      field: filtro_real
+      value: "yes"
+    }
+
+    filters: {
+      field: filtro_dia
+      value: "yes"
+    }
+  }
+
+  measure: tc_mtd {
+    type: average
+    sql: ${tipo_cambio.tipo_cambio} ;;
+
+    filters: {
+      field: filtro_real
+      value: "yes"
+    }
+
+    filters: {
+      field: filtro_mtd
+      value: "yes"
+    }
   }
 
   measure: daily_sales {

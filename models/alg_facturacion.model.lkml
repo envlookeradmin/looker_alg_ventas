@@ -58,6 +58,13 @@ explore: ventas {
     relationship: many_to_one
   }
 
+  join: tipo_cambio {
+    type: left_outer
+    sql_on: ${ventas.fecha} = ${tipo_cambio.fecha}
+            and ${ventas.moneda_transaccion} = ${tipo_cambio.moneda_origen};;
+    relationship: many_to_one
+  }
+
   #access_filter: {
   #  field: planta.cluster
   #  user_attribute: alg_cluster

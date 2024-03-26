@@ -25,12 +25,20 @@ view: tipo_cambio {
 
   dimension: tipo_cambio {
     type: number
-    sql: ${TABLE}.Tipo_Cambio;;
+    sql: CASE
+          WHEN ${TABLE}.Tipo_Cambio < 0
+          THEN (${TABLE}.Tipo_Cambio * -1)
+          ELSE ${TABLE}.Tipo_Cambio
+         END ;;
   }
 
   dimension: presupuesto {
     type: number
-    sql: ${TABLE}.Presupuesto;;
+    sql: CASE
+           WHEN ${TABLE}.Presupuesto
+           THEN 1
+           ELSE 0
+         END;;
   }
 
 }
