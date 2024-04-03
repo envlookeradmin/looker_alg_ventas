@@ -1,6 +1,6 @@
 view: grupo_material {
 
-  sql_table_name:`envases-analytics-qa.RPT_ALG.Dim_GrupoMateriales` ;;
+  sql_table_name:`@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_GrupoMateriales` ;;
 
 
   dimension: id_fuente {

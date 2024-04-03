@@ -1,6 +1,6 @@
 view: fecha {
 
-  sql_table_name: `envases-analytics-qa.ENVASES_REPORTING.CALENDAR` ;;
+  sql_table_name: `@{GCP_PROJECT}.@{REPORTING_DATASET}.CALENDAR` ;;
 
   dimension_group: date {
     type: time

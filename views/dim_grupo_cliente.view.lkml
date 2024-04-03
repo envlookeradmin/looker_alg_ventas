@@ -1,6 +1,6 @@
 view: grupo_cliente {
 
-  sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_GrupoClientes`;;
+  sql_table_name: `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_GrupoClientes`;;
 
 
   dimension: id_fuente {

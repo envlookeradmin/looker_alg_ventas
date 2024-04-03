@@ -15,6 +15,8 @@ persist_with: alg_facturacion_default_datagroup
 
 explore: bitacora {}
 
+explore: d_tc {}
+
 explore: ventas {
   join: fecha {
     type: left_outer
@@ -61,7 +63,10 @@ explore: ventas {
   join: tipo_cambio {
     type: left_outer
     sql_on: ${ventas.fecha} = ${tipo_cambio.fecha}
-            and ${ventas.moneda_transaccion} = ${tipo_cambio.moneda_origen};;
+            and ${ventas.moneda_transaccion} = ${tipo_cambio.moneda_origen}
+            and ${ventas.moneda_conversion} = ${tipo_cambio.moneda_conversion}
+            and ${ventas.tipo_transaccion} = ${tipo_cambio.presupuesto}
+            ;;
     relationship: many_to_one
   }
 
@@ -74,5 +79,62 @@ explore: ventas {
   #  field: planta.pais
   #  user_attribute: alg_country
   #}
+
+}
+
+explore: ventas1 {
+  join: fecha {
+    type: left_outer
+    sql_on: ${ventas1.fecha} = ${fecha.fecha} ;;
+    relationship: many_to_one
+  }
+  join: planta {
+    type: left_outer
+    sql_on: ${ventas1.id_planta} = ${planta.id_planta}
+      and ${ventas1.id_fuente} = ${planta.id_fuente} ;;
+    relationship: many_to_one
+  }
+  join: cliente {
+    type: left_outer
+    sql_on: ${ventas1.codigo_cliente} = ${cliente.codigo_cliente}
+            and ${ventas1.id_fuente} = ${cliente.id_fuente}
+            and ${ventas1.organizacion_ventas} = ${cliente.organizacion_ventas}
+            and ${ventas1.codigo_canal_distribucion} = ${cliente.codigo_canal_distribucion}
+            and ${ventas1.division} = ${cliente.division};;
+    relationship: many_to_one
+  }
+
+  join: grupo_cliente {
+    type: left_outer
+    sql_on: ${cliente.codigo_grupo_clientes} = ${grupo_cliente.codigo_grupo_clientes}
+      and ${cliente.id_fuente} = ${grupo_cliente.id_fuente};;
+    relationship: many_to_one
+  }
+
+  join: material {
+    type: left_outer
+    sql_on: ${ventas1.codigo_material} = ${material.codigo_material}
+      and ${ventas1.id_fuente} = ${material.id_fuente} ;;
+    relationship: many_to_one
+  }
+
+  join: grupo_material {
+    type: left_outer
+    sql_on: ${material.codigo_grupo_materiales} = ${grupo_material.codigo_grupo_materiales}
+      and ${material.id_fuente} = ${grupo_material.id_fuente};;
+    relationship: many_to_one
+  }
+
+  join: tipo_cambio1 {
+    type: left_outer
+    sql_on: ${ventas1.fecha} = ${tipo_cambio1.fecha}
+            and ${ventas1.moneda_transaccion} = ${tipo_cambio1.moneda_origen}
+            and ${ventas1.moneda_conversion} = ${tipo_cambio1.moneda_conversion}
+            and ${ventas1.tipo_transaccion} = ${tipo_cambio1.presupuesto}
+            ;;
+    relationship: many_to_one
+  }
+
+
 
 }

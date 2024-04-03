@@ -1,4 +1,4 @@
-view: ventas {
+view: ventas1 {
 
   derived_table: {
     sql:
@@ -27,8 +27,7 @@ view: ventas {
 
       Tipo_Cambio_MXN,
       Monto_Conversion_MXN,
-      1 AS Bandera_Resumen,
-      0 AS Bandera_Total
+      1 AS Bandera_Resumen
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas`
       WHERE Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND Fecha <= CAST({% date_start date_filter %} AS DATE)
@@ -59,13 +58,12 @@ view: ventas {
 
       0 Tipo_Cambio_MXN,
       0 Monto_Conversion_MXN,
-      0 AS Bandera_Resumen,
-      1 AS Bandera_Total
+      0 AS Bandera_Resumen
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas` v
       WHERE v.Moneda_Transaccion IN ('CAD','DKK','GTQ')
       AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23
       UNION ALL
 
       --CARGA TOTAL MXN México
@@ -93,13 +91,12 @@ view: ventas {
 
       0 Tipo_Cambio_MXN,
       0 Monto_Conversion_MXN,
-      0 AS Bandera_Resumen,
-      1 AS Bandera_Total
+      0 AS Bandera_Resumen
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas` v
       WHERE v.Organizacion_Ventas IN ("MXF1", "MXFC")
       AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23
 
       --CARGA TOTAL MXN que no es México
       UNION ALL
@@ -127,13 +124,12 @@ view: ventas {
 
       0 Tipo_Cambio_MXN,
       0 Monto_Conversion_MXN,
-      0 AS Bandera_Resumen,
-      1 AS Bandera_Total
+      0 AS Bandera_Resumen
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas` v
       WHERE v.Organizacion_Ventas NOT IN ("MXF1", "MXFC")
       AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23
 
       --CARGA TOTAL USD
       UNION ALL
@@ -161,12 +157,11 @@ view: ventas {
 
       0 Tipo_Cambio_MXN,
       0 Monto_Conversion_MXN,
-      1 AS Bandera_Resumen,
-      1 AS Bandera_Total
+      1 AS Bandera_Resumen
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas` v
       WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23
 
       --CARGA TOTAL EUR
       UNION ALL
@@ -194,12 +189,11 @@ view: ventas {
 
       0 Tipo_Cambio_MXN,
       0 Monto_Conversion_MXN,
-      0 AS Bandera_Resumen,
-      1 AS Bandera_Total
+      0 AS Bandera_Resumen
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas` v
       WHERE v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23
 
       --CARGA SUBTOTALES USD - EUR
       UNION ALL
@@ -237,15 +231,14 @@ view: ventas {
 
       0 Tipo_Cambio_MXN,
       0 Monto_Conversion_MXN,
-      1 AS Bandera_Resumen,
-      1 AS Bandera_Total
+      1 AS Bandera_Resumen
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas` v
       LEFT JOIN `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Planta`  AS p ON v.Planta = p.ID_Planta
       and v.ID_Fuente = p.ID_Fuente
       WHERE p.Region IN ('Americas', 'Europa')
       AND v.Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %})) -1 AS STRING),"-01-01")  AS DATE)
       AND v.Fecha <= CAST({% date_start date_filter %} AS DATE)
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23
       ;;
   }
 
@@ -342,11 +335,6 @@ view: ventas {
   dimension: bandera_resumen {
     type: number
     sql: ${TABLE}.Bandera_Resumen ;;
-  }
-
-  dimension: bandera_total {
-    type: number
-    sql: ${TABLE}.Bandera_Total ;;
   }
 
   dimension: cluster_resumen {
@@ -984,10 +972,16 @@ view: ventas {
     sql: ${TABLE}.Moneda_Conversion ;;
   }
 
+  #dimension: UKURS {
+  #  type: number
+  #  sql: ${TABLE}.UKURS ;;
+  #  value_format: "#,##0.00"
+  #}
+
   dimension: FCURR {
     label: "CURRENCY TYPE"
     type: string
-    sql: ${tipo_cambio.moneda_origen} ;;
+    sql: ${tipo_cambio1.moneda_origen} ;;
   }
 
   dimension: cantidad {
@@ -1000,6 +994,48 @@ view: ventas {
     hidden: yes
     type: number
     sql: ${TABLE}.Monto_Transaccion / 1000
+      ;;
+  }
+
+  dimension: monto_transaccion_mtd {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion
+      ;;
+  }
+
+  dimension: monto_transaccion_mtd_ly {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion
+      ;;
+  }
+
+  dimension: monto_transaccion_ytd {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion
+      ;;
+  }
+
+  dimension: monto_transaccion_ytd_ly {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion
+      ;;
+  }
+
+  dimension: monto_transaccion_bud_mtd {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion
+      ;;
+  }
+
+  dimension: monto_transaccion_bud_ytd {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Monto_Transaccion
       ;;
   }
 
@@ -1102,123 +1138,83 @@ view: ventas {
   }
 
 
-################### dimensiones_tipo_cambio
-
-  dimension: tc_diario {
-    type: number
-    sql: ${tipo_cambio.tc} ;;
-
-    value_format: "#,##0.00"
-  }
-
-  dimension: tc_mtd {
-    type: number
-    sql: ${tipo_cambio.tc_mtd} ;;
-
-    value_format: "#,##0.00"
-  }
-
-  dimension: tc_mtd_ly {
-    type: number
-    sql: ${tipo_cambio.tc_mtd_ly} ;;
-
-    value_format: "#,##0.00"
-  }
-
-  dimension: tc_ytd {
-    type: number
-    sql: ${tipo_cambio.tc_ytd} ;;
-
-    value_format: "#,##0.00"
-  }
-
-  dimension: tc_ytd_ly {
-    type: number
-    sql: ${tipo_cambio.tc_ytd_ly} ;;
-
-    value_format: "#,##0.00"
-  }
-
-  dimension: tc_bud_mtd {
-    type: number
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
-
-    value_format: "#,##0.00"
-  }
-
-  dimension: tc_bud_ytd {
-    type: number
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
-
-    value_format: "#,##0.00"
-  }
-
-################### termina dimensiones_tipo_cambio
-
-################### metricas
-
 ################### metricas_tipo_cambio
 
-  measure: m_tc_diario {
-    label: "ER DAILY"
+  measure: tc_diario {
     type: max
-    sql: ${tipo_cambio.tc} ;;
+    sql: ${tipo_cambio1.tipo_cambio} ;;
+
+    filters: {
+      field: filtro_dia
+      value: "yes"
+    }
 
     value_format: "#,##0.00"
   }
 
-  measure: m_tc_mtd {
-    label: "ER MONTHLY"
-    type: max
-    sql: ${tipo_cambio.tc_mtd} ;;
+  measure: tc_mtd {
+    type: average
+    sql: ${tipo_cambio1.tipo_cambio} ;;
+
+    filters: {
+      field: filtro_mtd
+      value: "yes"
+    }
 
     value_format: "#,##0.00"
   }
 
-  measure: m_tc_mtd_ly {
-    label: "ER MONTHLY LY"
-    type: max
-    sql: ${tipo_cambio.tc_mtd_ly} ;;
+  measure: tc_mtd_ly {
+    type: average
+    sql: ${tipo_cambio1.tipo_cambio} ;;
+
+    filters: {
+      field: filtro_mtd_ly
+      value: "yes"
+    }
 
     value_format: "#,##0.00"
   }
 
-  measure: m_tc_ytd {
-    label: "ER ANNUAL"
-    type: max
-    sql: ${tipo_cambio.tc_ytd} ;;
+  measure: tc_ytd {
+    type: average
+    sql: ${tipo_cambio1.tipo_cambio} ;;
+
+    filters: {
+      field: filtro_ytd
+      value: "yes"
+    }
 
     value_format: "#,##0.00"
   }
 
-  measure: m_tc_ytd_ly {
-    label: "ER ANNUAL LY"
-    type: max
-    sql: ${tipo_cambio.tc_ytd_ly} ;;
+  measure: tc_ytd_ly {
+    type: average
+    sql: ${tipo_cambio1.tipo_cambio} ;;
+
+    filters: {
+      field: filtro_ytd_ly
+      value: "yes"
+    }
 
     value_format: "#,##0.00"
   }
 
-  measure: m_tc_bud_mtd {
-    label: "ER BUD"
-    type: max
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
+  measure: tc_bud_mtd {
+    type: average
+    sql: ${tipo_cambio1.tipo_cambio} ;;
 
-    value_format: "#,##0.00"
-  }
-
-  measure: m_tc_bud_ytd {
-    hidden: yes
-    label: "ER BUD ANNUAL"
-    type: max
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
+    filters: {
+      field: filtro_mtd
+      value: "yes"
+    }
 
     value_format: "#,##0.00"
   }
 
 ################### termina metricas_tipo_cambio
 
-
+  #metricas
 
   measure: empty_value1 {
     label: "Empty value 1"
@@ -1242,9 +1238,9 @@ view: ventas {
   measure: daily_sales {
     hidden: yes
     group_label: "Daily"
-    label: "DAILY SALES"
+    label: "DAILY SALES_sin"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_diario},1);;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_dia
@@ -1260,11 +1256,10 @@ view: ventas {
 
 
   measure: total_daily_sales {
-    hidden: yes
-    #group_label: "Daily"
-    #label: "DAILY SALES"
+    group_label: "Daily"
+    label: "DAILY SALES"
     type: number
-    sql: ${daily_sales} ;;
+    sql: ${daily_sales} * COALESCE(${tc_diario},1) ;;
 
 
     drill_fields: [ codigo_cliente,nombre_cliente,total_daily_sales]
@@ -1299,7 +1294,7 @@ view: ventas {
     group_label: "Monthly"
     label: "NATIONAL AMOUNT MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_mtd
@@ -1324,8 +1319,10 @@ view: ventas {
     group_label: "Monthly"
     label: "EXPORT AMOUNT MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
+    sql: ${monto_transaccion} ;;
 
+    #filters: [canal_distribucion: "EXPORTACION"]
+    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: tipo_transaccion_vta_exp
@@ -1347,7 +1344,9 @@ view: ventas {
     group_label: "Monthly"
     label: "TOTAL AMOUNT MTD"
     type: number
-    sql: ${national_amount_mtd} + ${export_amount_mtd} ;;
+    sql: ( ${national_amount_mtd} + ${export_amount_mtd} ) * COALESCE(${tc_mtd},1)
+          --${national_amount_mtd} + ${export_amount_mtd}
+          ;;
 
     drill_fields: [ codigo_cliente,nombre_cliente,total_amount_mtd]
 
@@ -1367,7 +1366,7 @@ view: ventas {
     group_label: "Monthly"
     label: "NATIONAL AMOUNT MTD LY"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd_ly},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_mtd_ly
@@ -1393,7 +1392,7 @@ view: ventas {
     label: "EXPORT AMOUNT MTD LY"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd_ly},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_mtd_ly
@@ -1417,7 +1416,9 @@ view: ventas {
     group_label: "Monthly"
     label: "TOTAL AMOUNT MTD LY"
     type: number
-    sql: ${national_amount_mtd_ly} + ${export_amount_mtd_ly} ;;
+    sql: ( ${national_amount_mtd_ly} + ${export_amount_mtd_ly} ) * COALESCE(${tc_mtd_ly},1)
+          --${national_amount_mtd_ly} + ${export_amount_mtd_ly}
+          ;;
 
     drill_fields: [ codigo_cliente,nombre_cliente, total_amount_mtd_ly]
 
@@ -1455,7 +1456,7 @@ view: ventas {
     group_label: "Monthly"
     label: "Z NATIONAL AMOUNT BUD MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_mtd},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_mtd
@@ -1480,8 +1481,7 @@ view: ventas {
     label: "Z EXPORT AMOUNT BUD MTD"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_mtd},1) ;;
-
+    sql: ${monto_transaccion} ;;
     filters: {
       field: filtro_mtd
       value: "yes"
@@ -1504,7 +1504,9 @@ view: ventas {
     group_label: "Monthly"
     label: "TOTAL AMOUNT BUD MTD"
     type: number
-    sql: ${z_national_amount_bud_mtd} + ${z_export_amount_bud_mtd} ;;
+    sql: ( ${z_national_amount_bud_mtd} + ${z_export_amount_bud_mtd} ) * COALESCE(${tc_bud_mtd},1)
+          --${z_national_amount_bud_mtd} + ${z_export_amount_bud_mtd}
+          ;;
 
     drill_fields: [ codigo_cliente,nombre_cliente, total_amount_bud_mtd]
 
@@ -1781,7 +1783,7 @@ view: ventas {
     group_label: "Annual"
     label: "NATIONAL AMOUNT YTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_ytd
@@ -1806,7 +1808,7 @@ view: ventas {
     group_label: "Annual"
     label: "EXPORT AMOUNT YTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
+    sql: ${monto_transaccion} ;;
 
     #filters: [canal_distribucion: "EXPORTACION"]
     #filters: [tipo_transaccion: "VENTA"]
@@ -1831,7 +1833,9 @@ view: ventas {
     group_label: "Annual"
     label: "TOTAL AMOUNT YTD"
     type: number
-    sql: ${national_amount_ytd} + ${export_amount_ytd} ;;
+    sql: ( ${national_amount_ytd} + ${export_amount_ytd} ) * COALESCE(${tc_ytd},1)
+          --${national_amount_ytd} + ${export_amount_ytd}
+          ;;
 
     drill_fields: [ codigo_cliente,nombre_cliente,total_amount_ytd]
 
@@ -1843,7 +1847,7 @@ view: ventas {
     group_label: "Annual"
     label: "NATIONAL AMOUNT YTD LY"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd_ly},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_ytd_ly
@@ -1869,7 +1873,7 @@ view: ventas {
     label: "EXPORT AMOUNT YTD LY"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd_ly},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_ytd_ly
@@ -1893,7 +1897,9 @@ view: ventas {
     group_label: "Annual"
     label: "TOTAL AMOUNT YTD LY"
     type: number
-    sql: ${national_amount_ytd_ly} + ${export_amount_ytd_ly} ;;
+    sql: ( ${national_amount_ytd_ly} + ${export_amount_ytd_ly} ) * COALESCE(${tc_ytd_ly},1)
+          --${national_amount_ytd_ly} + ${export_amount_ytd_ly}
+          ;;
 
     drill_fields: [ codigo_cliente,nombre_cliente, total_amount_ytd_ly]
 
@@ -1931,7 +1937,7 @@ view: ventas {
     group_label: "Annual"
     label: "Z NATIONAL AMOUNT BUD YTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_ytd},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_ytd
@@ -1956,7 +1962,7 @@ view: ventas {
     label: "Z EXPORT AMOUNT BUD YTD"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_ytd},1) ;;
+    sql: ${monto_transaccion} ;;
 
     filters: {
       field: filtro_ytd
@@ -1980,7 +1986,9 @@ view: ventas {
     group_label: "Annual"
     label: "TOTAL AMOUNT BUD YTD"
     type: number
-    sql: ${z_national_amount_bud_ytd} + ${z_export_amount_bud_ytd} ;;
+    sql: ( ${z_national_amount_bud_ytd} + ${z_export_amount_bud_ytd} ) * COALESCE(${tc_bud_mtd},1)
+          --${z_national_amount_bud_ytd} + ${z_export_amount_bud_ytd}
+          ;;
 
     drill_fields: [ codigo_cliente,nombre_cliente, total_amount_bud_ytd]
 

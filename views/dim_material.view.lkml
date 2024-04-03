@@ -1,6 +1,6 @@
 view: material {
 
-  sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_Material` ;;
+  sql_table_name: `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Material` ;;
 
 
   dimension: id_fuente {

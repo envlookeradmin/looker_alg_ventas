@@ -1,6 +1,6 @@
 view: planta {
 
-  sql_table_name: `envases-analytics-qa.RPT_ALG.Dim_Planta` ;;
+  sql_table_name: `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Planta` ;;
 
 
   dimension: id_fuente {

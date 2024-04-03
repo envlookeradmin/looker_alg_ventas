@@ -7,7 +7,7 @@ view: bitacora {
           when time_zone = 'EST' THEN 'USA - CANADA (EST)'
           end as time_zone,
           max(format_datetime('%F %R', date_time) ) as date_time
-          from `ENVASES_REPORTING.bitacora_074`
+          from `@{GCP_PROJECT}.@{REPORTING_DATASET}.bitacora_074`
          group by 1
       ;;
   }
