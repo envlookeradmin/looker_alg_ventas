@@ -15,7 +15,7 @@ persist_with: alg_facturacion_default_datagroup
 
 explore: bitacora {}
 
-explore: d_tc {}
+#explore: d_tc {}
 
 explore: ventas {
   join: fecha {
@@ -73,10 +73,5 @@ explore: ventas {
     field: planta.cluster
     user_attribute: alg_cluster
   }
-
-  #access_filter: {
-  #  field: planta.pais
-  #  user_attribute: alg_country
-  #}
 
 }
