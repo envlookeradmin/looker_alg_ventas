@@ -3,8 +3,8 @@ view: tipo_cambio {
   derived_table: {
     sql:
       SELECT
-      ID_Fuente,
-      Fecha,
+      --ID_Fuente,
+      --Fecha,
       Moneda_Origen,
       Moneda_Conversion,
       CASE
@@ -97,7 +97,7 @@ view: tipo_cambio {
       AS NUMERIC) END ) as Tipo_Cambio_Bud_MTD_LY
 
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`
-      GROUP BY 1,2,3,4,5
+      GROUP BY 1,2,3--,4,5
       ;;
   }
 
