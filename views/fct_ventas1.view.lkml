@@ -1,4 +1,4 @@
-view: ventas {
+view: ventas1 {
 
   derived_table: {
     sql:
@@ -88,10 +88,10 @@ view: ventas {
       '' AS SubCategoria,
       v.Moneda_Transaccion,
       CASE
-    WHEN v.Organizacion_Ventas NOT IN ("MXF1", "MXFC")
-    THEN 'MXN'
-    ELSE ''
-    END AS Moneda_Conversion,
+      WHEN v.Organizacion_Ventas NOT IN ("MXF1", "MXFC")
+      THEN 'MXN'
+      ELSE ''
+      END AS Moneda_Conversion,
       0 AS Cantidad,
       SUM(v.Monto) AS Monto_Transaccion,
 
@@ -956,7 +956,7 @@ view: ventas {
   dimension: FCURR {
     label: "CURRENCY TYPE"
     type: string
-    sql: ${tipo_cambio.moneda_origen} ;;
+    sql: ${tipo_cambio1.moneda_origen} ;;
   }
 
   dimension: cantidad {
@@ -1075,63 +1075,57 @@ view: ventas {
 
   dimension: tc_diario {
     type: number
-    sql: ${tipo_cambio.tc} ;;
+    sql: ${tipo_cambio1.tipo_cambio} ;;
 
     value_format: "#,##0.00"
   }
 
   dimension: tc_mtd {
     type: number
-    sql: ${tipo_cambio.tc_mtd} ;;
+    sql: ${tipo_cambio1.tipo_cambio_mtd} ;;
 
     value_format: "#,##0.00"
   }
 
   dimension: tc_mtd_ly {
     type: number
-    sql: ${tipo_cambio.tc_mtd_ly} ;;
+    sql: ${tipo_cambio1.tipo_cambio_mtd_ly} ;;
 
     value_format: "#,##0.00"
   }
 
   dimension: tc_ytd {
     type: number
-    sql: ${tipo_cambio.tc_ytd} ;;
+    sql: ${tipo_cambio1.tipo_cambio_ytd} ;;
 
     value_format: "#,##0.00"
   }
 
   dimension: tc_ytd_ly {
     type: number
-    sql: ${tipo_cambio.tc_ytd_ly} ;;
+    sql: ${tipo_cambio1.tipo_cambio_ytd_ly} ;;
 
     value_format: "#,##0.00"
   }
 
-  dimension: tc_bud_mtd {
-    type: number
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
-
-    value_format: "#,##0.00"
-  }
-
-  dimension: tc_bud_ytd {
-    type: number
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
-
-    value_format: "#,##0.00"
-  }
 
 ################### termina dimensiones_tipo_cambio
 
 ################### metricas
 
-################### metricas_tipo_cambio
+####### metricas_tipo_cambio
 
   measure: m_tc_diario {
     label: "ER DAILY"
     type: max
-    sql: ${tipo_cambio.tc} ;;
+    sql: ${tipo_cambio1.tipo_cambio} ;;
+
+    #filters: {
+    #  field: filtro_dia
+    #  value: "yes"
+    #}
+
+    filters: [tipo_transaccion: "Venta"]
 
     value_format: "#,##0.00"
   }
@@ -1139,7 +1133,14 @@ view: ventas {
   measure: m_tc_mtd {
     label: "ER MONTHLY"
     type: max
-    sql: ${tipo_cambio.tc_mtd} ;;
+    sql: ${tipo_cambio1.tipo_cambio_mtd} ;;
+
+    #filters: {
+    #  field: filtro_mtd
+    #  value: "yes"
+    #}
+
+    filters: [tipo_transaccion: "Venta"]
 
     value_format: "#,##0.00"
   }
@@ -1147,7 +1148,14 @@ view: ventas {
   measure: m_tc_mtd_ly {
     label: "ER MONTHLY LY"
     type: max
-    sql: ${tipo_cambio.tc_mtd_ly} ;;
+    sql: ${tipo_cambio1.tipo_cambio_mtd_ly} ;;
+
+    #filters: {
+    #  field: filtro_mtd_ly
+    #  value: "yes"
+    #}
+
+    filters: [tipo_transaccion: "Venta"]
 
     value_format: "#,##0.00"
   }
@@ -1155,7 +1163,14 @@ view: ventas {
   measure: m_tc_ytd {
     label: "ER ANNUAL"
     type: max
-    sql: ${tipo_cambio.tc_ytd} ;;
+    sql: ${tipo_cambio1.tipo_cambio_ytd} ;;
+
+    #filters: {
+    #  field: filtro_ytd
+    #  value: "yes"
+    #}
+
+    filters: [tipo_transaccion: "Venta"]
 
     value_format: "#,##0.00"
   }
@@ -1163,7 +1178,14 @@ view: ventas {
   measure: m_tc_ytd_ly {
     label: "ER ANNUAL LY"
     type: max
-    sql: ${tipo_cambio.tc_ytd_ly} ;;
+    sql: ${tipo_cambio1.tipo_cambio_ytd_ly} ;;
+
+    #filters: {
+    #  field: filtro_ytd_ly
+    #  value: "yes"
+    #}
+
+    filters: [tipo_transaccion: "Venta"]
 
     value_format: "#,##0.00"
   }
@@ -1171,7 +1193,14 @@ view: ventas {
   measure: m_tc_bud_mtd {
     label: "ER BUD"
     type: max
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
+    sql: ${tipo_cambio1.tipo_cambio_mtd} ;;
+
+    #filters: {
+    #  field: filtro_mtd
+    #  value: "yes"
+    #}
+
+    filters: [tipo_transaccion: "Presupuesto"]
 
     value_format: "#,##0.00"
   }
@@ -1180,12 +1209,19 @@ view: ventas {
     hidden: yes
     label: "ER BUD ANNUAL"
     type: max
-    sql: ${tipo_cambio.tc_bud_mtd} ;;
+    sql: ${tipo_cambio1.tipo_cambio_ytd} ;;
+
+    #filters: {
+    #  field: filtro_ytd
+    #  value: "yes"
+    #}
+
+    filters: [tipo_transaccion: "Presupuesto"]
 
     value_format: "#,##0.00"
   }
 
-################### termina metricas_tipo_cambio
+####### termina metricas_tipo_cambio
 
 
 
@@ -1424,7 +1460,7 @@ view: ventas {
     group_label: "Monthly"
     label: "Z NATIONAL AMOUNT BUD MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_mtd},1) ;;
+    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
 
     filters: {
       field: filtro_mtd
@@ -1449,7 +1485,7 @@ view: ventas {
     label: "Z EXPORT AMOUNT BUD MTD"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_mtd},1) ;;
+    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
 
     filters: {
       field: filtro_mtd
@@ -1900,7 +1936,7 @@ view: ventas {
     group_label: "Annual"
     label: "Z NATIONAL AMOUNT BUD YTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_ytd},1) ;;
+    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
 
     filters: {
       field: filtro_ytd
@@ -1925,7 +1961,7 @@ view: ventas {
     label: "Z EXPORT AMOUNT BUD YTD"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_bud_ytd},1) ;;
+    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
 
     filters: {
       field: filtro_ytd
