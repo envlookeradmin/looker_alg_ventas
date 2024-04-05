@@ -1240,7 +1240,7 @@ view: ventas {
   }
 
   measure: daily_sales {
-    hidden: yes
+    #hidden: yes
     group_label: "Daily"
     label: "DAILY SALES"
     type: sum
