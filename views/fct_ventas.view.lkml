@@ -1361,20 +1361,23 @@ view: ventas {
 ################### metricas
 
   measure: empty_value1 {
+    group_label: "Others"
     label: "Empty value 1"
     type: string
     sql: '';;
   }
 
   measure: empty_value2 {
+    group_label: "Others"
     label: "Empty value 2"
     type: string
     sql: '';;
   }
 
   measure: ultima_actualizacion {
-    type: date
+    group_label: "Others"
     label: "Update date"
+    type: date
     sql: MAX(${fecha});;
     convert_tz: no
   }
