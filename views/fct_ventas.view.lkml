@@ -449,14 +449,12 @@ view: ventas {
 
   dimension: pais_destinatario {
     group_label: "Destinatario"
-    hidden: yes
     type: string
     sql: ${TABLE}.Pais_Destinatario ;;
   }
 
   dimension: ciudad_destinatario {
     group_label: "Destinatario"
-    hidden: yes
     type: string
     sql: ${TABLE}.Ciudad_Destinatario ;;
   }
