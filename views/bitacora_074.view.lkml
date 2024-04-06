@@ -1,27 +1,24 @@
 view: bitacora {
   derived_table: {
     sql: select
-          case
-          when time_zone = 'CST' THEN 'MEXICO (CST)'
-          when time_zone = 'CET' THEN 'EUROPE (CET)'
-          when time_zone = 'EST' THEN 'USA - CANADA (EST)'
-          end as time_zone,
-          max(format_datetime('%F %R', date_time) ) as date_time
-          from `@{GCP_PROJECT}.@{REPORTING_DATASET}.bitacora_074`
-         group by 1
+          region,
+          time_zone,
+          max(format_datetime('%F %R', datetime) ) as date_time
+          from `@{GCP_PROJECT}.@{REPORTING_DATASET1}.bitacora`
+         group by 1,2
       ;;
   }
 
   dimension: time_zone {
     label: "REGION / TIME ZONE"
     type: string
-    sql: ${TABLE}.TIME_ZONE ;;
+    sql: ${TABLE}.region || ' (' || ${TABLE}.time_zone || ')';;
   }
 
   dimension: date_time {
     label: "DATE TIME"
     type: string
-    sql: ${TABLE}.DATE_TIME ;;
+    sql: ${TABLE}.date_time ;;
   }
 
 

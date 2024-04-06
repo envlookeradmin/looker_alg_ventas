@@ -1,10 +1,12 @@
 view: tipo_cambio {
 
+  #sql_table_name: `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas` ;;
+
   derived_table: {
     sql:
+      WITH dim_divisas as (
       SELECT
-      --ID_Fuente,
-      --Fecha,
+      Fecha,
       Moneda_Origen,
       Moneda_Conversion,
       CASE
@@ -12,162 +14,100 @@ view: tipo_cambio {
            THEN 'Presupuesto'
            ELSE 'Venta'
          END AS Presupuesto,
-      MAX(CASE
-      WHEN Presupuesto = false
-      AND Fecha >= CAST( REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)
-      AND Fecha <= CAST( REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)
-      THEN CAST(
-      CASE
-      WHEN Tipo_Cambio < 0
-      THEN (Tipo_Cambio * -1)
-      ELSE Tipo_Cambio
-      END
-      AS NUMERIC) END ) as Tipo_Cambio,
-
-      AVG(CASE
-      WHEN Presupuesto = false
-      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
-      AND Fecha <= DATE_ADD((CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)),INTERVAL -0 day)
-      THEN CAST(
-      CASE
-      WHEN Tipo_Cambio < 0
-      THEN (Tipo_Cambio * -1)
-      ELSE Tipo_Cambio
-      END
-      AS NUMERIC) END ) as Tipo_Cambio_MTD,
-
-      AVG(CASE
-      WHEN Presupuesto = false
-      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
-      AND Fecha <= DATE_ADD(   DATE_ADD( CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
-      THEN CAST(
-      CASE
-      WHEN Tipo_Cambio < 0
-      THEN (Tipo_Cambio * -1)
-      ELSE Tipo_Cambio
-      END
-      AS NUMERIC) END ) as Tipo_Cambio_MTD_LY,
-
-      AVG(CASE
-      WHEN Presupuesto = false
-      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE (REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-'))) AS STRING),"-01-01")  AS DATE)
-      AND Fecha <= DATE_TRUNC(CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE), DAY)
-      THEN CAST(
-      CASE
-      WHEN Tipo_Cambio < 0
-      THEN (Tipo_Cambio * -1)
-      ELSE Tipo_Cambio
-      END
-      AS NUMERIC) END ) as Tipo_Cambio_YTD,
-
-      AVG(CASE
-      WHEN Presupuesto = false
-      AND Fecha >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE (REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-'))) -1 AS STRING),"-01-01")  AS DATE)
-      AND Fecha <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)
-      THEN CAST(
-      CASE
-      WHEN Tipo_Cambio < 0
-      THEN (Tipo_Cambio * -1)
-      ELSE Tipo_Cambio
-      END
-      AS NUMERIC) END ) as Tipo_Cambio_YTD_LY,
-
-      AVG(CASE
-      WHEN Presupuesto = true
-      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)), INTERVAL 1 DAY),INTERVAL -1 MONTH)
-      AND Fecha <= DATE_ADD((CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)),INTERVAL -0 day)
-      THEN CAST(
-      CASE
-      WHEN Tipo_Cambio < 0
-      THEN (Tipo_Cambio * -1)
-      ELSE Tipo_Cambio
-      END
-      AS NUMERIC) END ) as Tipo_Cambio_Bud_MTD,
-
-      AVG(CASE
-      WHEN Presupuesto = true
-      AND Fecha >= DATE_ADD(DATE_ADD(LAST_DAY(DATE_ADD( CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE) ,INTERVAL -1 YEAR) ), INTERVAL 1 DAY),INTERVAL -1 MONTH)
-      AND Fecha <= DATE_ADD(   DATE_ADD( CAST(REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE) ,INTERVAL -1 YEAR)    ,INTERVAL -0 day)
-      THEN CAST(
-      CASE
-      WHEN Tipo_Cambio < 0
-      THEN (Tipo_Cambio * -1)
-      ELSE Tipo_Cambio
-      END
-      AS NUMERIC) END ) as Tipo_Cambio_Bud_MTD_LY
-
+      Tipo_Cambio,
+      avg(Tipo_Cambio)
+      over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+      order by Fecha, Moneda_Origen, Moneda_Conversion) Tipo_Cambio_AVG_mensual,
+      avg(Tipo_Cambio)
+      over(partition by extract(year from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+      order by Fecha, Moneda_Origen, Moneda_Conversion) Tipo_Cambio_AVG_anual
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`
-      GROUP BY 1,2,3--,4,5
+      )
+
+      select
+      Moneda_Origen,
+      Moneda_Conversion,
+      Presupuesto,
+      MAX( CASE
+      WHEN Fecha = CAST( REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)
+      THEN Tipo_Cambio
+      END ) AS Tipo_Cambio,
+      MAX( CASE
+      WHEN Fecha = CAST( REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)
+      THEN Tipo_Cambio_AVG_mensual
+      END ) AS Tipo_Cambio_AVG_mensual,
+      MAX( CASE
+      WHEN Fecha = CAST( REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE)
+      THEN Tipo_Cambio_AVG_anual END ) AS Tipo_Cambio_AVG_anual,
+      MAX( CASE
+      WHEN Fecha = DATE_ADD( CAST( REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE),INTERVAL -1 year)
+      THEN Tipo_Cambio_AVG_mensual END ) AS Tipo_Cambio_AVG_mensual_LY,
+      MAX( CASE
+      WHEN Fecha = DATE_ADD( CAST( REPLACE( {{ _filters['ventas.date_filter'] | sql_quote }} ,'/','-') AS DATE),INTERVAL -1 year)
+      THEN Tipo_Cambio_AVG_anual END ) AS Tipo_Cambio_AVG_anual_LY
+      from dim_divisas
+      GROUP BY 1,2,3
       ;;
-  }
-
-  dimension: id_fuente {
-    type: string
-    sql: ${TABLE}.ID_Fuente ;;
-  }
-
-  dimension: fecha {
-    type: date
-    sql: ${TABLE}.Fecha ;;
   }
 
   dimension: moneda_origen {
     type: string
-    sql: ${TABLE}.Moneda_Origen ;;
+    sql: ${TABLE}.Moneda_Origen;;
   }
 
   dimension: moneda_conversion {
     type: string
-    sql: ${TABLE}.Moneda_Conversion ;;
-  }
-
-  dimension: tc {
-    type: number
-    sql: ${TABLE}.Tipo_Cambio ;;
-
-    #value_format: "#,##0.00"
-  }
-
-  dimension: tc_mtd {
-    hidden: yes
-    type: number
-    sql: ${TABLE}.Tipo_Cambio_MTD ;;
-  }
-
-  dimension: tc_mtd_ly {
-    hidden: yes
-    type: number
-    sql: ${TABLE}.Tipo_Cambio_MTD_LY ;;
-  }
-
-  dimension: tc_ytd {
-    hidden: yes
-    type: number
-    sql: ${TABLE}.Tipo_Cambio_YTD ;;
-  }
-
-  dimension: tc_ytd_ly {
-    hidden: yes
-    type: number
-    sql: ${TABLE}.Tipo_Cambio_YTD_LY ;;
-  }
-
-  dimension: tc_bud_mtd {
-    hidden: yes
-    type: number
-    sql: ${TABLE}.Tipo_Cambio_Bud_MTD ;;
-  }
-
-  dimension: tc_bud_mtd_ly {
-    hidden: yes
-    type: number
-    sql: ${TABLE}.Tipo_Cambio_Bud_MTD_LY ;;
+    sql: ${TABLE}.Moneda_Conversion;;
   }
 
   dimension: presupuesto {
-    #hidden: yes
     type: string
     sql: ${TABLE}.Presupuesto ;;
+  }
+
+  dimension: tipo_cambio {
+    type: number
+    sql: CASE
+          WHEN ${TABLE}.Tipo_Cambio < 0
+          THEN (${TABLE}.Tipo_Cambio * -1)
+          ELSE ${TABLE}.Tipo_Cambio
+         END ;;
+  }
+
+  dimension: tipo_cambio_mtd {
+    type: number
+    sql: CASE
+          WHEN ${TABLE}.Tipo_Cambio_AVG_mensual < 0
+          THEN (${TABLE}.Tipo_Cambio_AVG_mensual * -1)
+          ELSE ${TABLE}.Tipo_Cambio_AVG_mensual
+         END ;;
+  }
+
+  dimension: tipo_cambio_ytd {
+    type: number
+    sql: CASE
+          WHEN ${TABLE}.Tipo_Cambio_AVG_anual < 0
+          THEN (${TABLE}.Tipo_Cambio_AVG_anual * -1)
+          ELSE ${TABLE}.Tipo_Cambio_AVG_anual
+         END ;;
+  }
+
+  dimension: tipo_cambio_mtd_ly {
+    type: number
+    sql: CASE
+          WHEN ${TABLE}.Tipo_Cambio_AVG_mensual_LY < 0
+          THEN (${TABLE}.Tipo_Cambio_AVG_mensual_LY * -1)
+          ELSE ${TABLE}.Tipo_Cambio_AVG_mensual_LY
+         END ;;
+  }
+
+  dimension: tipo_cambio_ytd_ly {
+    type: number
+    sql: CASE
+          WHEN ${TABLE}.Tipo_Cambio_AVG_anual_LY < 0
+          THEN (${TABLE}.Tipo_Cambio_AVG_anual_LY * -1)
+          ELSE ${TABLE}.Tipo_Cambio_AVG_anual_LY
+         END ;;
   }
 
 
