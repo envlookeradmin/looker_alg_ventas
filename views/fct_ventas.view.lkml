@@ -491,14 +491,14 @@ view: ventas {
            WHEN ${categoria} = 'SUBTOTAL USD' THEN 'SUB America (USD)'
            WHEN ${categoria} = 'SUBTOTAL EUR' THEN 'SUB Europa (EUR)'
            WHEN ${categoria} = 'TOTAL USD' THEN 'TOTAL USD'
-           WHEN ${planta.cluster} = 'Mexico' THEN 'Mexico (MXN)'
-           WHEN ${planta.cluster} = 'USA' THEN 'USA (USD)'
-           WHEN ${planta.cluster} = 'Canada' THEN 'Canada (CAD)'
-           WHEN ${planta.cluster} = 'Guatemala' THEN 'Guatemala (GTQ)'
-           WHEN ${planta.cluster} = 'ECN - North' THEN 'ECN - North (DKK)'
-           WHEN ${planta.cluster} = 'ECC - Central' THEN 'ECC - Central (EUR)'
-           WHEN ${planta.cluster} = 'ECW - West' THEN 'ECW - West (EUR)'
-           WHEN ${planta.cluster} = 'ECS - South' THEN 'ECS - South (EUR)'
+           WHEN ${cluster} = 'Mexico' THEN 'Mexico (MXN)'
+           WHEN ${cluster} = 'USA' THEN 'USA (USD)'
+           WHEN ${cluster} = 'Canada' THEN 'Canada (CAD)'
+           WHEN ${cluster} = 'Guatemala' THEN 'Guatemala (GTQ)'
+           WHEN ${cluster} = 'ECN - North' THEN 'ECN - North (DKK)'
+           WHEN ${cluster} = 'ECC - Central' THEN 'ECC - Central (EUR)'
+           WHEN ${cluster} = 'ECW - West' THEN 'ECW - West (EUR)'
+           WHEN ${cluster} = 'ECS - South' THEN 'ECS - South (EUR)'
          END ;;
 
     html: {% if value == 'TOTAL MXN' or
@@ -523,14 +523,14 @@ view: ventas {
            WHEN ${categoria} = 'SUBTOTAL USD' THEN 'A05'
            WHEN ${categoria} = 'SUBTOTAL EUR' THEN 'A10'
            WHEN ${categoria} = 'TOTAL USD' THEN 'Z10'
-           WHEN ${planta.cluster} = 'Mexico' THEN 'A01'
-           WHEN ${planta.cluster} = 'USA' THEN 'A02'
-           WHEN ${planta.cluster} = 'Canada' THEN 'A03'
-           WHEN ${planta.cluster} = 'Guatemala' THEN 'A04'
-           WHEN ${planta.cluster} = 'ECN - North' THEN 'A06'
-           WHEN ${planta.cluster} = 'ECC - Central' THEN 'A07'
-           WHEN ${planta.cluster} = 'ECW - West' THEN 'A08'
-           WHEN ${planta.cluster} = 'ECS - South' THEN 'A09'
+           WHEN ${cluster} = 'Mexico' THEN 'A01'
+           WHEN ${cluster} = 'USA' THEN 'A02'
+           WHEN ${cluster} = 'Canada' THEN 'A03'
+           WHEN ${cluster} = 'Guatemala' THEN 'A04'
+           WHEN ${cluster} = 'ECN - North' THEN 'A06'
+           WHEN ${cluster} = 'ECC - Central' THEN 'A07'
+           WHEN ${cluster} = 'ECW - West' THEN 'A08'
+           WHEN ${cluster} = 'ECS - South' THEN 'A09'
          END ;;
   }
 
@@ -539,11 +539,11 @@ view: ventas {
     type: string
     sql: ${TABLE}.Categoria ;;
 
-    html: {% if value == 'TOTAL LOCAL CURRENCY USD' or
-          value == 'TOTAL LOCAL CURRENCY DKK' or
-          value == 'TOTAL LOCAL CURRENCY EUR' or
-          value == 'TOTAL LOCAL CURRENCY GTQ' or
-          value == 'TOTAL LOCAL CURRENCY CAD' or
+    html: {% if value == 'TOTAL LOCAL USD' or
+          value == 'TOTAL LOCAL DKK' or
+          value == 'TOTAL LOCAL EUR' or
+          value == 'TOTAL LOCAL GTQ' or
+          value == 'TOTAL LOCAL CAD' or
           value == 'TOTAL MXN' or
           value == 'TOTAL USD' or
           value == 'TOTAL EUR'
@@ -625,7 +625,7 @@ view: ventas {
     type: string
     sql:
     case
-      when ${planta.cluster} = 'Mexico' then
+      when ${cluster} = 'Mexico' then
         case
           when ${TABLE}.Categoria="CP 10L" then "A03"
           when ${TABLE}.Categoria="CP 15L" then "A02"
@@ -689,7 +689,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = 'USA' then
+      when ${cluster} = 'USA' then
       case
       when ${TABLE}.Categoria="Bote Pint. Envases Ohio" then "A01"
       when ${TABLE}.Categoria="Cub.Lam. Envases Ohio" then "A02"
@@ -703,7 +703,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = 'ECN - North' then
+      when ${cluster} = 'ECN - North' then
 
       case
       when ${TABLE}.Categoria="Mediapack" then "a01"
@@ -738,7 +738,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = 'ECC - Central' then
+      when ${cluster} = 'ECC - Central' then
 
       case
 
@@ -784,7 +784,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = "ECS - South" then
+      when ${cluster} = "ECS - South" then
 
       case
       when ${TABLE}.Categoria="Fish - 1/2 Oval" then "a01"
@@ -834,7 +834,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = "ECW - West" then
+      when ${cluster} = "ECW - West" then
 
       case
       when ${TABLE}.Categoria="Coating and Printing Services" then "a01"
@@ -873,7 +873,7 @@ view: ventas {
     type: string
     sql:
     case
-      when ${planta.cluster} = 'Mexico' then
+      when ${cluster} = 'Mexico' then
         case
           when ${TABLE}.SubCategoria="CP 10L" then "A03"
           when ${TABLE}.SubCategoria="CP 15L" then "A02"
@@ -937,7 +937,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = 'USA' then
+      when ${cluster} = 'USA' then
       case
       when ${TABLE}.SubCategoria="Bote Pint. Envases Ohio" then "A01"
       when ${TABLE}.SubCategoria="Cub.Lam. Envases Ohio" then "A02"
@@ -951,7 +951,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = 'ECN - North' then
+      when ${cluster} = 'ECN - North' then
 
       case
       when ${TABLE}.SubCategoria="Mediapack" then "a01"
@@ -986,7 +986,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = 'ECC - Central' then
+      when ${cluster} = 'ECC - Central' then
 
       case
 
@@ -1032,7 +1032,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = "ECS - South" then
+      when ${cluster} = "ECS - South" then
 
       case
       when ${TABLE}.SubCategoria="Fish - 1/2 Oval" then "a01"
@@ -1082,7 +1082,7 @@ view: ventas {
       --else "Z03"
       end
 
-      when ${planta.cluster} = "ECW - West" then
+      when ${cluster} = "ECW - West" then
 
       case
       when ${TABLE}.SubCategoria="Coating and Printing Services" then "a01"
@@ -1289,7 +1289,7 @@ view: ventas {
 
   measure: m_tc_mtd {
     group_label: "ER"
-    label: "ER MONTHLY"
+    label: "ER MTH"
     type: max
     sql: ${tipo_cambio.tipo_cambio_mtd} ;;
 
@@ -1300,7 +1300,7 @@ view: ventas {
 
   measure: m_tc_mtd_ly {
     group_label: "ER"
-    label: "ER MONTHLY LY"
+    label: "ER MTH LYR"
     type: max
     sql: ${tipo_cambio.tipo_cambio_mtd_ly} ;;
 
@@ -1311,7 +1311,7 @@ view: ventas {
 
   measure: m_tc_ytd {
     group_label: "ER"
-    label: "ER ANNUAL"
+    label: "ER YR"
     type: max
     sql: ${tipo_cambio.tipo_cambio_ytd} ;;
 
@@ -1322,7 +1322,7 @@ view: ventas {
 
   measure: m_tc_ytd_ly {
     group_label: "ER"
-    label: "ER ANNUAL LY"
+    label: "ER LYR"
     type: max
     sql: ${tipo_cambio.tipo_cambio_ytd_ly} ;;
 
@@ -1345,7 +1345,7 @@ view: ventas {
   measure: m_tc_bud_ytd {
     group_label: "ER"
     hidden: yes
-    label: "ER BUD ANNUAL"
+    label: "ER BUD YR"
     type: max
     sql: ${tipo_cambio.tipo_cambio_ytd} ;;
 

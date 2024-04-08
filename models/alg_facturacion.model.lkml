@@ -1,4 +1,4 @@
-connection: "envases_analytics_qa"
+connection: "envases-eon-alg"
 
 # include all the views
 include: "/views/**/*.view.lkml"
@@ -21,42 +21,6 @@ explore: ventas {
   join: fecha {
     type: left_outer
     sql_on: ${ventas.fecha} = ${fecha.fecha} ;;
-    relationship: many_to_one
-  }
-  join: planta {
-    type: inner
-    sql_on: ${ventas.id_planta} = ${planta.id_planta}
-            and ${ventas.id_fuente} = ${planta.id_fuente} ;;
-    relationship: many_to_one
-  }
-  join: cliente {
-    type: left_outer
-    sql_on: ${ventas.codigo_cliente} = ${cliente.codigo_cliente}
-            and ${ventas.id_fuente} = ${cliente.id_fuente}
-            and ${ventas.organizacion_ventas} = ${cliente.organizacion_ventas}
-            and ${ventas.codigo_canal_distribucion} = ${cliente.codigo_canal_distribucion}
-            and ${ventas.division} = ${cliente.division};;
-    relationship: many_to_one
-  }
-
-  join: grupo_cliente {
-    type: left_outer
-    sql_on: ${cliente.codigo_grupo_clientes} = ${grupo_cliente.codigo_grupo_clientes}
-            and ${cliente.id_fuente} = ${grupo_cliente.id_fuente};;
-    relationship: many_to_one
-  }
-
-  join: material {
-    type: left_outer
-    sql_on: ${ventas.codigo_material} = ${material.codigo_material}
-            and ${ventas.id_fuente} = ${material.id_fuente} ;;
-    relationship: many_to_one
-  }
-
-  join: grupo_material {
-    type: left_outer
-    sql_on: ${material.codigo_grupo_materiales} = ${grupo_material.codigo_grupo_materiales}
-            and ${material.id_fuente} = ${grupo_material.id_fuente};;
     relationship: many_to_one
   }
 

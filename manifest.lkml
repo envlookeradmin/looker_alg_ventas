@@ -1,12 +1,12 @@
 project_name: "alg_facturacion"
 
 constant: CONNECTION_NAME {
-  value: "envases_analytics_qa"
+  value: "envases-eon-alg"
   export: override_required
 }
 
 constant: GCP_PROJECT {
-  value: "envases-analytics-qa"
+  value: "envases-analytics-eon-poc"
   export: override_required
 }
 
