@@ -33,6 +33,11 @@ explore: ventas {
     relationship: many_to_one
   }
 
+  join: subtotal_over {
+    type: cross
+    relationship: one_to_many
+  }
+
   access_filter: {
     field: ventas.cluster
     user_attribute: alg_cluster

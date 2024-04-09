@@ -50,6 +50,17 @@ view: ventas {
     sql: ${TABLE}.Orden ;;
   }
 
+  dimension: categoria1 {
+    label: "CATEGORY1"
+    type: string
+    sql: ${TABLE}.Categoria ;;
+  }
+
+  measure: conteo {
+    type:  count_distinct
+    sql: ${orden};;
+  }
+
   dimension: id_fuente {
     hidden: yes
     type: string
