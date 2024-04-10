@@ -56,6 +56,12 @@ view: ventas {
     sql: ${TABLE}.Categoria ;;
   }
 
+  dimension: subcategoria1 {
+    label: "SUBCATEGORY1"
+    type: string
+    sql: ${TABLE}.SubCategoria ;;
+  }
+
   measure: conteo {
     type:  count_distinct
     sql: ${orden};;

@@ -11,15 +11,15 @@ dimension: row_type_checker {
     sql:coalesce(${TABLE}.row_type,'SUBTOTAL');;
   }
 
-  dimension: category_name {
-    order_by_field: category_order
+  dimension: subcategory_name {
+    #order_by_field: subcategory_order
     # For subtotal rows: show 'SUBTOTAL'.  For nulls, show '∅' (supports intuitive sorting).  Otherwise use raw base table field's data. Note, concatenation with '${row_type_checker}' is used to concisely force subtotal rows to evaluate to null, which is then converted to 'SUBTOTAL'
-    sql: coalesce(cast(coalesce(cast(${ventas.categoria1} as string),'∅')||${row_type_checker} as string),'SUBTOTAL');;
+    sql: coalesce(cast(coalesce(cast(${ventas.subcategoria1} as string),'∅')||${row_type_checker} as string),'SUBTOTAL');;
   }
-  dimension: category_order {
+  dimension: subcategory_order {
     hidden: yes
     #For order by fields, use a similar calculation, but use values that correctly put nulls at min and subtotals at max of sort order positioning
-    sql: coalesce(cast(coalesce(cast(${ventas.categoria1} as string),'          ')||${row_type_checker} as string),'ZZZZZZZZZZ');;
+    sql: coalesce(cast(coalesce(cast(${ventas.subcategoria1} as string),'          ')||${row_type_checker} as string),'ZZZZZZZZZZ');;
   }
 
 }
