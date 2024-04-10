@@ -15,8 +15,6 @@ persist_with: alg_facturacion_default_datagroup
 
 explore: bitacora {}
 
-#explore: d_tc {}
-
 explore: ventas {
   join: fecha {
     type: left_outer

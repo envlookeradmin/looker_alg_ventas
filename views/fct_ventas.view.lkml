@@ -75,7 +75,7 @@ view: ventas {
       v.Organizacion_Ventas,
       v.Division,
       '' AS Unidad_Base,
-      'TOTAL LOCAL '|| v.Moneda_Transaccion  AS Categoria,
+      'zTOTAL LOCAL '|| v.Moneda_Transaccion  AS Categoria,
       '' AS SubCategoria,
       v.Moneda_Transaccion,
       '' AS Moneda_Conversion,
@@ -120,7 +120,7 @@ view: ventas {
       v.Organizacion_Ventas,
       v.Division,
       '' AS Unidad_Base,
-      'TOTAL MXN' AS Categoria,
+      'zTOTAL MXN' AS Categoria,
       '' AS SubCategoria,
       v.Moneda_Transaccion,
       CASE
@@ -168,7 +168,7 @@ view: ventas {
       v.Organizacion_Ventas,
       v.Division,
       '' AS Unidad_Base,
-      'TOTAL USD' AS Categoria,
+      'zTOTAL USD' AS Categoria,
       '' AS SubCategoria,
       v.Moneda_Transaccion,
       'USD' AS Moneda_Conversion,
@@ -212,7 +212,7 @@ view: ventas {
       v.Organizacion_Ventas,
       v.Division,
       '' AS Unidad_Base,
-      'TOTAL EUR' AS Categoria,
+      'zTOTAL EUR' AS Categoria,
       '' AS SubCategoria,
       v.Moneda_Transaccion,
       'EUR' AS Moneda_Conversion,
@@ -295,28 +295,28 @@ view: ventas {
     sql: ${TABLE}.ID_Fuente ;;
   }
 
-  dimension: documento {
-    hidden: yes
-    type: string
-    sql: ${TABLE}.Documento ;;
-  }
+  #dimension: documento {
+  #  hidden: yes
+  #  type: string
+  #  sql: ${TABLE}.Documento ;;
+  #}
 
-  dimension: posicion {
-    hidden: yes
-    type: string
-    sql: ${TABLE}.Posicion ;;
-  }
+  #dimension: posicion {
+  #  hidden: yes
+  #  type: string
+  #  sql: ${TABLE}.Posicion ;;
+  #}
 
   dimension: tipo_transaccion {
     type: string
     sql: ${TABLE}.Tipo_Transaccion ;;
   }
 
-  dimension: tipo_documento {
-    hidden: yes
-    type: string
-    sql: ${TABLE}.Tipo_Documento ;;
-  }
+  #dimension: tipo_documento {
+  #  hidden: yes
+  #  type: string
+  #  sql: ${TABLE}.Tipo_Documento ;;
+  #}
 
   dimension: fecha {
     #hidden: yes
@@ -501,7 +501,7 @@ view: ventas {
     sql: CASE
            WHEN ${categoria} = 'SUBTOTAL USD' THEN 'SUB America (USD)'
            WHEN ${categoria} = 'SUBTOTAL EUR' THEN 'SUB Europa (EUR)'
-           WHEN ${categoria} = 'TOTAL USD' THEN 'TOTAL USD'
+           WHEN ${categoria} = 'zTOTAL USD' THEN 'TOTAL USD'
            WHEN ${cluster} = 'Mexico' THEN 'Mexico (MXN)'
            WHEN ${cluster} = 'USA' THEN 'USA (USD)'
            WHEN ${cluster} = 'Canada' THEN 'Canada (CAD)'
@@ -533,7 +533,7 @@ view: ventas {
     sql: CASE
            WHEN ${categoria} = 'SUBTOTAL USD' THEN 'A05'
            WHEN ${categoria} = 'SUBTOTAL EUR' THEN 'A10'
-           WHEN ${categoria} = 'TOTAL USD' THEN 'Z10'
+           WHEN ${categoria} = 'zTOTAL USD' THEN 'Z10'
            WHEN ${cluster} = 'Mexico' THEN 'A01'
            WHEN ${cluster} = 'USA' THEN 'A02'
            WHEN ${cluster} = 'Canada' THEN 'A03'
@@ -546,19 +546,19 @@ view: ventas {
   }
 
   dimension: categoria {
-    #order_by_field: orden_categoria
+
     label: "CATEGORY"
     type: string
     sql: ${TABLE}.Categoria ;;
 
-    html: {% if value == 'TOTAL LOCAL USD' or
-          value == 'TOTAL LOCAL DKK' or
-          value == 'TOTAL LOCAL EUR' or
-          value == 'TOTAL LOCAL GTQ' or
-          value == 'TOTAL LOCAL CAD' or
-          value == 'TOTAL MXN' or
-          value == 'TOTAL USD' or
-          value == 'TOTAL EUR'
+    html: {% if value == 'zTOTAL LOCAL USD' or
+          value == 'zTOTAL LOCAL DKK' or
+          value == 'zTOTAL LOCAL EUR' or
+          value == 'zTOTAL LOCAL GTQ' or
+          value == 'zTOTAL LOCAL CAD' or
+          value == 'zTOTAL MXN' or
+          value == 'zTOTAL USD' or
+          value == 'zTOTAL EUR'
           %}
         <p style="color: white; background-color: #5e2129; font-size:100%; text-align:left">{{ rendered_value }}</p>
 
@@ -630,17 +630,15 @@ view: ventas {
       <p style="">{{ rendered_value }}</p>
       {% endif %} ;;
 
-
+    #order_by_field: orden_categoria
   }
 
   dimension: orden_categoria {
     hidden: yes
     type: string
 
-    sql: ${TABLE}.Orden|| ${cluster} || ${categoria}
-    --SUBSTRING(${TABLE}.Orden,2,2) || ${cluster}
-      --${TABLE}.Orden
-      ;;
+    sql: ${TABLE}.Orden
+    ;;
 
   }
 
@@ -649,14 +647,13 @@ view: ventas {
     type: string
     sql: ${TABLE}.SubCategoria ;;
 
-    #order_by_field: orden_subcategoria
   }
 
 
   dimension: orden_subcategoria {
+    hidden: yes
     type: string
-    sql: SUBSTRING(${TABLE}.Orden,4,3) || ${cluster} || ${categoria}
-      ;;
+    sql: SUBSTRING(${TABLE}.Orden,4,3) || ${cluster} || ${categoria} ;;
   }
 
 
@@ -995,9 +992,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
-
     filters: {
       field: tipo_transaccion_vta_nac
       value: "yes"
@@ -1063,9 +1057,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
-
     filters: {
       field: tipo_transaccion_vta_nac
       value: "yes"
@@ -1088,9 +1079,6 @@ view: ventas {
       field: filtro_mtd_ly
       value: "yes"
     }
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: tipo_transaccion_vta_exp
@@ -1151,9 +1139,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
-
     filters: {
       field: tipo_transaccion_pre_nac
       value: "yes"
@@ -1175,9 +1160,6 @@ view: ventas {
       field: filtro_mtd
       value: "yes"
     }
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
 
     filters: {
       field: tipo_transaccion_pre_exp
@@ -1243,9 +1225,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
-
     filters: {
       field: tipo_transaccion_vta_nac
       value: "yes"
@@ -1267,9 +1246,6 @@ view: ventas {
       field: filtro_mtd
       value: "yes"
     }
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: tipo_transaccion_vta_exp
@@ -1301,9 +1277,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
-
     filters: {
       field: tipo_transaccion_vta_nac
       value: "yes"
@@ -1321,8 +1294,6 @@ view: ventas {
     type: sum
     sql: ${cantidad};;
 
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: filtro_mtd_ly
@@ -1389,8 +1360,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
 
     filters: {
       field: tipo_transaccion_pre_nac
@@ -1406,9 +1375,6 @@ view: ventas {
     label: "EXPORT QTY BUD MTD"
     type: sum
     sql: ${cantidad} ;;
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
 
     filters: {
       field: filtro_mtd
@@ -1477,9 +1443,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
-
     filters: {
       field: tipo_transaccion_vta_nac
       value: "yes"
@@ -1496,9 +1459,6 @@ view: ventas {
     label: "EXPORT AMOUNT YTD"
     type: sum
     sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: filtro_ytd
@@ -1539,8 +1499,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: tipo_transaccion_vta_nac
@@ -1565,8 +1523,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: tipo_transaccion_vta_exp
@@ -1627,9 +1583,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
-
     filters: {
       field: tipo_transaccion_pre_nac
       value: "yes"
@@ -1651,9 +1604,6 @@ view: ventas {
       field: filtro_ytd
       value: "yes"
     }
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
 
     filters: {
       field: tipo_transaccion_pre_exp
@@ -1722,9 +1672,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
-
     filters: {
       field: tipo_transaccion_vta_nac
       value: "yes"
@@ -1746,9 +1693,6 @@ view: ventas {
       field: filtro_ytd
       value: "yes"
     }
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: tipo_transaccion_vta_exp
@@ -1780,9 +1724,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "VENTA"]
-
     filters: {
       field: tipo_transaccion_vta_nac
       value: "yes"
@@ -1799,9 +1740,6 @@ view: ventas {
     label: "EXPORT QTY YTD LY"
     type: sum
     sql: ${cantidad};;
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "VENTA"]
 
     filters: {
       field: filtro_ytd_ly
@@ -1868,9 +1806,6 @@ view: ventas {
       value: "yes"
     }
 
-    #filters: [canal_distribucion: "NACIONAL"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
-
     filters: {
       field: tipo_transaccion_pre_nac
       value: "yes"
@@ -1885,9 +1820,6 @@ view: ventas {
     label: "EXPORT QTY BUD YTD"
     type: sum
     sql: ${cantidad} ;;
-
-    #filters: [canal_distribucion: "EXPORTACION"]
-    #filters: [tipo_transaccion: "PRESUPUESTO"]
 
     filters: {
       field: filtro_ytd
