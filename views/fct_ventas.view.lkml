@@ -546,6 +546,7 @@ view: ventas {
   }
 
   dimension: categoria {
+    #order_by_field: orden_categoria
     label: "CATEGORY"
     type: string
     sql: ${TABLE}.Categoria ;;
@@ -629,195 +630,16 @@ view: ventas {
       <p style="">{{ rendered_value }}</p>
       {% endif %} ;;
 
-    order_by_field: orden_categoria
+
   }
 
   dimension: orden_categoria {
+    hidden: yes
     type: string
 
-    sql: --${TABLE}.Orden|| ${cluster} || ${categoria}
+    sql: ${TABLE}.Orden|| ${cluster} || ${categoria}
     --SUBSTRING(${TABLE}.Orden,2,2) || ${cluster}
-      case
-      when ${cluster} = 'Mexico' then
-        case
-          when ${TABLE}.Categoria="Cubeta de Plastico" AND ${TABLE}.SubCategoria="CP 19L" then "A01"
-          when ${TABLE}.Categoria="Cubeta de Plastico" AND ${TABLE}.SubCategoria="CP 15L" then "A02"
-          when ${TABLE}.Categoria="Cubeta de Plastico" AND ${TABLE}.SubCategoria="CP 10L" then "A03"
-          when ${TABLE}.Categoria="Cubeta de Plastico" AND ${TABLE}.SubCategoria="CP 08L" then "A04"
-          when ${TABLE}.Categoria="Cubeta de Plastico" AND ${TABLE}.SubCategoria="CP 04L" then "A05"
-
-          when ${TABLE}.Categoria="Porron de Plastico" then "A07"
-          when ${TABLE}.Categoria="Tambores de Plastico" then "A08"
-          when ${TABLE}.Categoria="Bote Bocan" then "A09"
-          when ${TABLE}.Categoria="Tambores" then "A10"
-          when ${TABLE}.Categoria="Tambores Conicos" then "A11"
-          when ${TABLE}.Categoria="Cubeta de Lamina" then "A12"
-          when ${TABLE}.Categoria="Alcoholero" then "A13"
-          when ${TABLE}.Categoria="Bote de Pintura" then "A14"
-          when ${TABLE}.Categoria="Bote de Aerosol" then "A15"
-          when ${TABLE}.Categoria="Línea General" then "A16"
-          when ${TABLE}.Categoria="Bote Sanitario" then "A17"
-          when ${TABLE}.Categoria="Bote Atun" then "A18"
-          when ${TABLE}.Categoria="Bote Oval" then "A19"
-          when ${TABLE}.Categoria="Tapa Easy Open" then "A20"
-          when ${TABLE}.Categoria="Fondo Charola y Bafle" then "A21"
-          when ${TABLE}.Categoria="Tapa Twiss Off" then "A22"
-          when ${TABLE}.Categoria="Varios" then "A23"
-          when ${TABLE}.Categoria="Fish." then "A24"
-          when ${TABLE}.Categoria="PeelOff" then "A25"
-
-          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
-      end
-
-      when ${cluster} = 'USA' then
-      case
-          when ${TABLE}.Categoria="Bote Pint. Envases Ohio" then "A01"
-          when ${TABLE}.Categoria="Cub.Lam. Envases Ohio" then "A02"
-          when ${TABLE}.Categoria="F-style" then "A03"
-          when ${TABLE}.Categoria="Varios." then "A04"
-
-          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
-
-      end
-
-      when ${cluster} = 'ECN - North' then
-
-      case
-          when ${TABLE}.Categoria="Mediapack" then "a01"
-          when ${TABLE}.Categoria="Catering" then "a02"
-
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Club (Alu)" then "a03"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Club (Steel)" then "a04"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Hansa" then "a05"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Dingley" then "a06"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Round Fish" then "a07"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Other" then "a08"
-
-          when ${TABLE}.Categoria="Ham" then "a10"
-          when ${TABLE}.Categoria="Luncheon" then "a11"
-          when ${TABLE}.Categoria="Pullman" then "a12"
-          when ${TABLE}.Categoria="Roundfood" then "a13"
-          when ${TABLE}.Categoria="Beverage" then "a14"
-          when ${TABLE}.Categoria="Cookie" then "a15"
-          when ${TABLE}.Categoria="Feta" then "a16"
-          when ${TABLE}.Categoria="Milkpowder" then "a17"
-          when ${TABLE}.Categoria="PockIt" then "a18"
-          when ${TABLE}.Categoria="PeelOff" then "a19"
-          when ${TABLE}.Categoria="Super" then "a20"
-          when ${TABLE}.Categoria="Cookie" then "a21"
-          when ${TABLE}.Categoria="Other" then "a22"
-
-          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
-      end
-
-      when ${cluster} = 'ECC - Central' then
-
-      case
-
-          when ${TABLE}.Categoria="Beverage" and ${TABLE}.SubCategoria="Draught Kegs" then "a01"
-          when ${TABLE}.Categoria="Beverage" and ${TABLE}.SubCategoria="Gravity Kegs" then "a02"
-          when ${TABLE}.Categoria="Beverage" and ${TABLE}.SubCategoria="Beverage Miscellaneous" then "a03"
-          --when ${TABLE}.Categoria="Beverage" then "a04"
-
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Tin Cans" then "a05"
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Vacuum Ink" then "a06"
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Pails" then "a07"
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Hobbocks" then "a08"
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Square" then "a09"
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Miscellaneous" then "a10"
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Plastic" then "a11"
-          when ${TABLE}.Categoria="Industrial" and ${TABLE}.SubCategoria="Industrial - Others" then "a12"
-
-          when ${TABLE}.Categoria="SC Print" then "a14"
-
-          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
-      end
-
-      when ${cluster} = "ECS - South" then
-
-      case
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 1/2 Oval" then "a01"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 1/4 Oval" then "a02"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 127" then "a03"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 150" then "a04"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 153" then "a05"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 65" then "a06"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 73" then "a07"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 83" then "a08"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - 99" then "a09"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - Anchoas" then "a10"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - Club" then "a11"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - Goods for Resale" then "a12"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - Others" then "a13"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - Pails" then "a14"
-          when ${TABLE}.Categoria="Fish" AND ${TABLE}.SubCategoria="Fish - RR90" then "a15"
-          --when ${TABLE}.Categoria="Fish" then "a16"
-
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - 153" then "a17"
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - 65" then "a18"
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - 73" then "a19"
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - 83" then "a20"
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - 99" then "a21"
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - Club" then "a22"
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - Goods for Resale" then "a23"
-          when ${TABLE}.Categoria="Vegetables" AND ${TABLE}.SubCategoria="Vegetables - Others" then "a24"
-          --when ${TABLE}.Categoria="Vegetables" then "a25"
-
-          when ${TABLE}.Categoria="Industrial" AND ${TABLE}.SubCategoria="Industrial - 73" then "a26"
-          when ${TABLE}.Categoria="Industrial" AND ${TABLE}.SubCategoria="Industrial - 99" then "a27"
-          when ${TABLE}.Categoria="Industrial" AND ${TABLE}.SubCategoria="Industrial - General Line" then "a28"
-          when ${TABLE}.Categoria="Industrial" AND ${TABLE}.SubCategoria="Industrial - Goods for Resale" then "a29"
-          when ${TABLE}.Categoria="Industrial" AND ${TABLE}.SubCategoria="Industrial - Others" then "a30"
-          when ${TABLE}.Categoria="Industrial" AND ${TABLE}.SubCategoria="Industrial - Pails" then "a31"
-          --when ${TABLE}.Categoria="Industrial" then "a32"
-
-          when ${TABLE}.Categoria="Print and Coating Services" AND ${TABLE}.SubCategoria="Print and Coating Services - Goods for Resale" then "a33"
-          when ${TABLE}.Categoria="Print and Coating Services" AND ${TABLE}.SubCategoria="Print and Coating Services - Others" then "a34"
-          when ${TABLE}.Categoria="Print and Coating Services" AND ${TABLE}.SubCategoria="Print and Coating Services - Pails" then "a35"
-          --when ${TABLE}.Categoria="Print and Coating Services" then "a36"
-
-          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
-
-      end
-
-      when ${cluster} = "ECW - West" then
-
-      case
-          when ${TABLE}.Categoria="Coating and Printing Services" then "a01"
-          when ${TABLE}.Categoria="Tin cans and closures for tin cans" then "a02"
-          when ${TABLE}.Categoria="Vegetables" then "a03"
-          when ${TABLE}.Categoria="Industrial" then "a04"
-          when ${TABLE}.Categoria="Miscelaneous" then "a05"
-          when ${TABLE}.Categoria="Pails and lids for pails" then "a06"
-
-          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
-
-      end
-
-          when ${TABLE}.Categoria LIKE "TOTAL LOCAL%" then "Z01"
-          when ${TABLE}.Categoria="TOTAL MXN" then "Z02"
-          when ${TABLE}.Categoria="TOTAL USD" then "Z03"
-          when ${TABLE}.Categoria="TOTAL EUR" then "Z04"
-
-      end
+      --${TABLE}.Orden
       ;;
 
   }
