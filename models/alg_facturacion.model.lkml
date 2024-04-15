@@ -37,3 +37,12 @@ explore: ventas {
   }
 
 }
+
+explore: ventas_analisis {
+
+  access_filter: {
+    field: ventas_analisis.cluster
+    user_attribute: alg_cluster
+  }
+
+}
