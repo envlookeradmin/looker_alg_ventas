@@ -304,7 +304,7 @@ view: ventas_analisis {
     type: string
     sql: ${TABLE}.Categoria ;;
 
-    order_by_field: orden_categoria
+    #order_by_field: orden_categoria
   }
 
   dimension: orden_categoria {
@@ -364,8 +364,8 @@ view: ventas_analisis {
   }
 
   dimension: fecha_seleccionada {
-    hidden: yes
-    label: "Date filter"
+    #hidden: yes
+    label: "Data of the day"
     type: string
     sql: CAST({% date_start date_filter %} AS DATE) ;;
   }
