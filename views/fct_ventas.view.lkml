@@ -40,6 +40,11 @@ view: ventas {
       Orden,
       Cantidad,
       Monto_MXN,
+      NULL AS Tipo_Cambio,
+      NULL AS Tipo_Cambio_AVG_mensual,
+      NULL AS Tipo_Cambio_AVG_anual,
+      NULL AS Tipo_Cambio_AVG_mensual_LY,
+      NULL AS Tipo_Cambio_AVG_anual_LY,
       Monto AS Monto_Transaccion
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar`
 
@@ -84,149 +89,18 @@ view: ventas {
       'Z91001' AS Orden,
       0 AS Cantidad,
       0 AS Monto_MXN,
+      NULL AS Tipo_Cambio,
+      NULL AS Tipo_Cambio_AVG_mensual,
+      NULL AS Tipo_Cambio_AVG_anual,
+      NULL AS Tipo_Cambio_AVG_mensual_LY,
+      NULL AS Tipo_Cambio_AVG_anual_LY,
       SUM(v.Monto) AS Monto_Transaccion,
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
       WHERE v.Moneda_Transaccion IN ('CAD','DKK','GTQ')
       GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
       UNION ALL
 
-      --CARGA TOTAL MXN
-      SELECT
-      v.ID_Fuente,
-      v.Tipo_Transaccion,
-      v.Fecha,
-      v.Canal_Distribucion,
-      '' AS Material,
-      '' AS Descripcion_Material,
-      '' AS Grupo_Material,
-      '' AS Descripcion_Grupo_Material,
-      '' AS Jerarquia,
-      '' AS Dimensiones,
-      v.Planta,
-      v.Nombre_Planta,
-      v.Ciudad,
-      v.Pais,
-      v.Cluster,
-      v.Region,
-      v.Cliente,
-      v.Nombre_Cliente,
-      v.Pais_Cliente,
-      v.Ciudad_Cliente,
-      v.Grupo_Cliente,
-      '' AS Destinatario,
-      '' AS Nombre_Destinatario,
-      '' AS Pais_Destinatario,
-      '' AS Ciudad_Destinatario,
-      v.Organizacion_Ventas,
-      v.Division,
-      '' AS Unidad_Base,
-      'zTOTAL MXN' AS Categoria,
-      '' AS SubCategoria,
-      v.Moneda_Transaccion,
-      CASE
-      WHEN v.Organizacion_Ventas NOT IN ("MXF1", "MXFC")
-      THEN 'MXN'
-      ELSE ''
-      END AS Moneda_Conversion,
-      0 AS Bandera_Resumen,
-      1 AS Bandera_Total,
-      'Z92001' AS Orden,
-      0 AS Cantidad,
-      0 AS Monto_MXN,
-      SUM(v.Monto) AS Monto_Transaccion
-      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
-
-      --CARGA TOTAL USD
-      UNION ALL
-      SELECT
-      v.ID_Fuente,
-      v.Tipo_Transaccion,
-      v.Fecha,
-      v.Canal_Distribucion,
-      '' AS Material,
-      '' AS Descripcion_Material,
-      '' AS Grupo_Material,
-      '' AS Descripcion_Grupo_Material,
-      '' AS Jerarquia,
-      '' AS Dimensiones,
-      v.Planta,
-      v.Nombre_Planta,
-      v.Ciudad,
-      v.Pais,
-      v.Cluster,
-      v.Region,
-      v.Cliente,
-      v.Nombre_Cliente,
-      v.Pais_Cliente,
-      v.Ciudad_Cliente,
-      v.Grupo_Cliente,
-      '' AS Destinatario,
-      '' AS Nombre_Destinatario,
-      '' AS Pais_Destinatario,
-      '' AS Ciudad_Destinatario,
-      v.Organizacion_Ventas,
-      v.Division,
-      '' AS Unidad_Base,
-      'zTOTAL USD' AS Categoria,
-      '' AS SubCategoria,
-      v.Moneda_Transaccion,
-      'USD' AS Moneda_Conversion,
-      1 AS Bandera_Resumen,
-      1 AS Bandera_Total,
-      'Z93001' AS Orden,
-      0 AS Cantidad,
-      0 AS Monto_MXN,
-      SUM(v.Monto) AS Monto_Transaccion
-      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
-
-      --CARGA TOTAL EUR
-      UNION ALL
-      SELECT
-      v.ID_Fuente,
-      v.Tipo_Transaccion,
-      v.Fecha,
-      v.Canal_Distribucion,
-      '' AS Material,
-      '' AS Descripcion_Material,
-      '' AS Grupo_Material,
-      '' AS Descripcion_Grupo_Material,
-      '' AS Jerarquia,
-      '' AS Dimensiones,
-      v.Planta,
-      v.Nombre_Planta,
-      v.Ciudad,
-      v.Pais,
-      v.Cluster,
-      v.Region,
-      v.Cliente,
-      v.Nombre_Cliente,
-      v.Pais_Cliente,
-      v.Ciudad_Cliente,
-      v.Grupo_Cliente,
-      '' AS Destinatario,
-      '' AS Nombre_Destinatario,
-      '' AS Pais_Destinatario,
-      '' AS Ciudad_Destinatario,
-      v.Organizacion_Ventas,
-      v.Division,
-      '' AS Unidad_Base,
-      'zTOTAL EUR' AS Categoria,
-      '' AS SubCategoria,
-      v.Moneda_Transaccion,
-      'EUR' AS Moneda_Conversion,
-      0 AS Bandera_Resumen,
-      1 AS Bandera_Total,
-      'Z94001' AS Orden,
-      0 AS Cantidad,
-      0 AS Monto_MXN,
-      SUM(v.Monto) AS Monto_Transaccion
-      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
-
-      --CARGA SUBTOTALES USD - EUR
-      UNION ALL
+      --CARGA TOTALES
       SELECT
       v.ID_Fuente,
       v.Tipo_Transaccion,
@@ -257,33 +131,127 @@ view: ventas {
       v.Division,
       '' AS Unidad_Base,
       CASE
-      WHEN v.Region IN ('Americas')
-      THEN 'SUBTOTAL USD'
-      WHEN v.Region IN ('Europa')
-      THEN 'SUBTOTAL EUR'
+      WHEN D_MC.Categoria = 'SUBTOTAL' AND v.Region IN ('Americas')
+      THEN D_MC.Categoria||' USD'
+      WHEN D_MC.Categoria = 'SUBTOTAL' AND v.Region IN ('Europa')
+      THEN D_MC.Categoria||' EUR'
+      ELSE D_MC.Categoria
       END AS Categoria,
       '' AS SubCategoria,
       v.Moneda_Transaccion,
       CASE
-      WHEN v.Region IN ('Americas')
+      WHEN D_MC.Categoria = 'SUBTOTAL' AND v.Region IN ('Americas')
       THEN 'USD'
-      WHEN v.Region IN ('Europa')
+      WHEN D_MC.Categoria = 'SUBTOTAL' AND v.Region IN ('Europa')
       THEN 'EUR'
+      ELSE D_MC.Moneda_Conversion
       END AS Moneda_Conversion,
-      1 AS Bandera_Resumen,
-      1 AS Bandera_Total,
       CASE
-      WHEN v.Region IN ('Americas')
-      THEN 'Z93001'
-      WHEN v.Region IN ('Europa')
-      THEN 'Z93001'
-      END AS Orden,
+      WHEN D_MC.Categoria IN ('SUBTOTAL', 'zTOTAL USD')
+      THEN 1
+      ELSE 0
+      END AS Bandera_Resumen,
+      1 AS Bandera_Total,
+      D_MC.Orden AS Orden,
       0 AS Cantidad,
       0 AS Monto_MXN,
+      D_TC.Tipo_Cambio,
+      D_TC.Tipo_Cambio_AVG_mensual,
+      D_TC.Tipo_Cambio_AVG_anual,
+      D_TC.Tipo_Cambio_AVG_mensual_LY,
+      D_TC.Tipo_Cambio_AVG_anual_LY,
       SUM(v.Monto) AS Monto_Transaccion
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
-      WHERE v.Region IN ('Americas', 'Europa')
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+      cross join
+      ( SELECT
+      'MXN' AS Moneda_Conversion,
+      'zTOTAL MXN' AS Categoria,
+      'Z92001' AS Orden
+      UNION ALL
+      SELECT
+      'USD' AS Moneda_Conversion,
+      'zTOTAL USD' AS Categoria,
+      'Z93001' AS Orden
+      UNION ALL
+      SELECT
+      'EUR' AS Moneda_Conversion,
+      'zTOTAL EUR' AS Categoria,
+      'Z94001' AS Orden
+      UNION ALL
+      SELECT
+      '' AS Moneda_Conversion,
+      'SUBTOTAL' AS Categoria,
+      'Z93001' AS Orden ) AS D_MC left join
+
+      ( WITH dim_divisas as (
+      SELECT
+      Fecha,
+      Moneda_Origen,
+      Moneda_Conversion,
+      CASE
+      WHEN Presupuesto
+      THEN 'Presupuesto'
+      ELSE 'Venta'
+      END AS Presupuesto,
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END AS Tipo_Cambio,
+      avg(CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END)
+      over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+      order by Fecha, Moneda_Origen, Moneda_Conversion) Tipo_Cambio_AVG_mensual,
+      avg(CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END)
+      over(partition by extract(year from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+      order by Fecha, Moneda_Origen, Moneda_Conversion) Tipo_Cambio_AVG_anual
+      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`
+      )
+
+      select
+      Moneda_Origen,
+      Moneda_Conversion,
+      Presupuesto,
+      MAX( CASE
+      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+      THEN Tipo_Cambio
+      END ) AS Tipo_Cambio,
+      MAX( CASE
+      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+      THEN Tipo_Cambio_AVG_mensual
+      END ) AS Tipo_Cambio_AVG_mensual,
+      MAX( CASE
+      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+      THEN Tipo_Cambio_AVG_anual
+      END ) AS Tipo_Cambio_AVG_anual,
+      MAX( CASE
+      WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
+      THEN Tipo_Cambio_AVG_mensual
+      END ) AS Tipo_Cambio_AVG_mensual_LY,
+      MAX( CASE
+      WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
+      THEN Tipo_Cambio_AVG_anual
+      END ) AS Tipo_Cambio_AVG_anual_LY
+      from dim_divisas
+      GROUP BY 1,2,3
+      ) D_TC ON v.Moneda_Transaccion = D_TC.Moneda_Origen
+      and ( CASE
+      WHEN D_MC.Categoria = 'SUBTOTAL' AND v.Region IN ('Americas')
+      THEN 'USD'
+      WHEN D_MC.Categoria = 'SUBTOTAL' AND v.Region IN ('Europa')
+      THEN 'EUR'
+      ELSE D_MC.Moneda_Conversion
+      END ) = D_TC.Moneda_Conversion
+      and v.Tipo_Transaccion = D_TC.Presupuesto
+
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42
       ;;
   }
 
@@ -295,28 +263,10 @@ view: ventas {
     sql: ${TABLE}.ID_Fuente ;;
   }
 
-  #dimension: documento {
-  #  hidden: yes
-  #  type: string
-  #  sql: ${TABLE}.Documento ;;
-  #}
-
-  #dimension: posicion {
-  #  hidden: yes
-  #  type: string
-  #  sql: ${TABLE}.Posicion ;;
-  #}
-
   dimension: tipo_transaccion {
     type: string
     sql: ${TABLE}.Tipo_Transaccion ;;
   }
-
-  #dimension: tipo_documento {
-  #  hidden: yes
-  #  type: string
-  #  sql: ${TABLE}.Tipo_Documento ;;
-  #}
 
   dimension: fecha {
     #hidden: yes
@@ -638,7 +588,7 @@ view: ventas {
     type: string
 
     sql: ${TABLE}.Orden
-    ;;
+      ;;
 
   }
 
@@ -781,7 +731,7 @@ view: ventas {
   dimension: tc_diario {
     hidden: yes
     type: number
-    sql: ${tipo_cambio.tipo_cambio} ;;
+    sql: ${TABLE}.Tipo_Cambio ;;
 
     value_format: "#,##0.00"
   }
@@ -789,7 +739,7 @@ view: ventas {
   dimension: tc_mtd {
     hidden: yes
     type: number
-    sql: ${tipo_cambio.tipo_cambio_mtd} ;;
+    sql: ${TABLE}.Tipo_Cambio_AVG_mensual ;;
 
     value_format: "#,##0.00"
   }
@@ -797,7 +747,7 @@ view: ventas {
   dimension: tc_mtd_ly {
     hidden: yes
     type: number
-    sql: ${tipo_cambio.tipo_cambio_mtd_ly} ;;
+    sql: ${TABLE}.Tipo_Cambio_AVG_mensual_LY ;;
 
     value_format: "#,##0.00"
   }
@@ -805,7 +755,7 @@ view: ventas {
   dimension: tc_ytd {
     hidden: yes
     type: number
-    sql: ${tipo_cambio.tipo_cambio_ytd} ;;
+    sql: ${TABLE}.Tipo_Cambio_AVG_anual ;;
 
     value_format: "#,##0.00"
   }
@@ -813,7 +763,7 @@ view: ventas {
   dimension: tc_ytd_ly {
     hidden: yes
     type: number
-    sql: ${tipo_cambio.tipo_cambio_ytd_ly} ;;
+    sql: ${TABLE}.Tipo_Cambio_AVG_anual_LY ;;
 
     value_format: "#,##0.00"
   }
@@ -828,7 +778,7 @@ view: ventas {
     group_label: "ER"
     label: "ER"
     type: max
-    sql: ${tipo_cambio.tipo_cambio} ;;
+    sql: ${tc_diario} ;;
 
     filters: [tipo_transaccion: "Venta"]
 
@@ -839,7 +789,7 @@ view: ventas {
     group_label: "ER"
     label: "ER MTH"
     type: max
-    sql: ${tipo_cambio.tipo_cambio_mtd} ;;
+    sql: ${tc_mtd} ;;
 
     filters: [tipo_transaccion: "Venta"]
 
@@ -850,7 +800,7 @@ view: ventas {
     group_label: "ER"
     label: "ER MTH LYR"
     type: max
-    sql: ${tipo_cambio.tipo_cambio_mtd_ly} ;;
+    sql: ${tc_mtd_ly} ;;
 
     filters: [tipo_transaccion: "Venta"]
 
@@ -861,7 +811,7 @@ view: ventas {
     group_label: "ER"
     label: "ER YR"
     type: max
-    sql: ${tipo_cambio.tipo_cambio_ytd} ;;
+    sql: ${tc_ytd} ;;
 
     filters: [tipo_transaccion: "Venta"]
 
@@ -872,7 +822,7 @@ view: ventas {
     group_label: "ER"
     label: "ER LYR"
     type: max
-    sql: ${tipo_cambio.tipo_cambio_ytd_ly} ;;
+    sql: ${tc_ytd_ly} ;;
 
     filters: [tipo_transaccion: "Venta"]
 
@@ -883,7 +833,7 @@ view: ventas {
     group_label: "ER"
     label: "ER BUD"
     type: max
-    sql: ${tipo_cambio.tipo_cambio_mtd} ;;
+    sql: ${tc_mtd} ;;
 
     filters: [tipo_transaccion: "Presupuesto"]
 
@@ -895,7 +845,7 @@ view: ventas {
     hidden: yes
     label: "ER BUD YR"
     type: max
-    sql: ${tipo_cambio.tipo_cambio_ytd} ;;
+    sql: ${tc_ytd} ;;
 
     filters: [tipo_transaccion: "Presupuesto"]
 
