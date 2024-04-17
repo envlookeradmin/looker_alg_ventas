@@ -533,7 +533,7 @@ view: ventas {
       value != 'Pails' and
       value != 'Hobbocks' and
       value != 'Square' and
-      value != 'Miscellaneous' and
+
       value != 'Plastic' and
       value != 'Industrial - Others' and
 
