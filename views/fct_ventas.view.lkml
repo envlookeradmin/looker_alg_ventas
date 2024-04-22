@@ -1058,6 +1058,7 @@ view: ventas {
     sql: CASE
           WHEN ${total_amount_mtd} > 0 AND ${total_amount_mtd_ly} = 0 THEN 1
           WHEN ${total_amount_mtd} = 0 AND ${total_amount_mtd_ly} > 0 THEN -1
+          WHEN ${total_amount_mtd} > 0 AND ${total_amount_mtd_ly} < 0 THEN ((${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1)*-1
           WHEN (${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1 = 0 THEN 0
           ELSE (${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1
          END *100;;
