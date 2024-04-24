@@ -406,7 +406,7 @@ view: ventas_analisis {
   }
 
   #DAY
-  filter: filtro_dia {
+  dimension: filtro_dia {
     hidden: yes
     type: yesno
     sql: ${fecha} = CAST({% date_start date_filter %} AS DATE) ;;
