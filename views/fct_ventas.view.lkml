@@ -586,9 +586,7 @@ view: ventas {
   dimension: orden_categoria {
     hidden: yes
     type: string
-
-    sql: ${TABLE}.Orden
-      ;;
+    sql: ${TABLE}.Orden;;
 
   }
 
@@ -689,7 +687,7 @@ view: ventas {
   }
 
   #DAY
-  filter: filtro_dia {
+  dimension: filtro_dia {
     hidden: yes
     type: yesno
     sql: ${fecha} = CAST({% date_start date_filter %} AS DATE) ;;
@@ -897,37 +895,6 @@ view: ventas {
     value_format: "$#,##0.00"
   }
 
-
-  measure: total_daily_sales {
-    hidden: yes
-    type: number
-    sql: ${daily_sales} ;;
-
-    drill_fields: [ nombre_cliente,total_daily_sales]
-
-    value_format: "$#,##0.00"
-  }
-
-
-  measure: daily_sales_qty {
-    group_label: "Daily"
-    label: "DAILY SALES (QTY)"
-    type: sum
-    sql: ${cantidad} ;;
-
-    filters: {
-      field: filtro_dia
-      value: "yes"
-    }
-
-    filters: [tipo_transaccion: "Venta"]
-
-    drill_fields: [ nombre_cliente,daily_sales]
-
-    value_format: "#,##0"
-  }
-
-
   #MONTHLY-MONEY-MTD
 
   measure: national_amount_mtd {
@@ -985,14 +952,6 @@ view: ventas {
     drill_fields: [ nombre_cliente,total_amount_mtd]
 
     value_format: "$#,##0.00"
-  }
-
-  measure: total_amount_ {
-    group_label: "Monthly"
-    label: "TOTAL AMOUNT BY MONTH"
-    type:  number
-    sql: SUM( CASE WHEN ${canal_distribucion} = "Nacional" THEN ${monto_transaccion} END ) +
-      SUM( CASE WHEN ${canal_distribucion} = "Exportacion" THEN ${monto_transaccion} END ) ;;
   }
 
   measure: national_amount_mtd_ly{
