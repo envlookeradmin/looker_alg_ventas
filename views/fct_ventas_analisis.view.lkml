@@ -618,7 +618,7 @@ view: ventas_analisis {
 
     filters: [tipo_transaccion: "Venta"]
 
-    drill_fields: [ nombre_cliente,daily_sales]
+    drill_fields: [ nombre_cliente,daily_sales_qty]
 
     value_format: "#,##0"
   }
