@@ -590,7 +590,7 @@ view: ventas_analisis {
     group_label: "Daily"
     label: "DAILY SALES"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_diario},1);;
+    sql: ${monto_transaccion} * ${tc_diario} ;;
 
     filters: {
       field: filtro_dia
@@ -631,7 +631,7 @@ view: ventas_analisis {
     group_label: "Monthly"
     label: "NATIONAL AMOUNT MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
+    sql: ${monto_transaccion} * ${tc_mtd} ;;
 
     filters: {
       field: filtro_mtd
@@ -653,7 +653,7 @@ view: ventas_analisis {
     group_label: "Monthly"
     label: "EXPORT AMOUNT MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
+    sql: ${monto_transaccion} * ${tc_mtd} ;;
 
 
     filters: {
@@ -699,7 +699,7 @@ view: ventas_analisis {
     group_label: "Monthly"
     label: "NATIONAL AMOUNT MTD LY"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd_ly},1) ;;
+    sql: ${monto_transaccion} * ${tc_mtd_ly} ;;
 
     filters: {
       field: filtro_mtd_ly
@@ -722,7 +722,7 @@ view: ventas_analisis {
     label: "EXPORT AMOUNT MTD LY"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd_ly},1) ;;
+    sql: ${monto_transaccion} * ${tc_mtd_ly} ;;
 
     filters: {
       field: filtro_mtd_ly
@@ -784,7 +784,7 @@ view: ventas_analisis {
     group_label: "Monthly"
     label: "Z NATIONAL AMOUNT BUD MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
+    sql: ${monto_transaccion} * ${tc_mtd} ;;
 
     filters: {
       field: filtro_mtd
@@ -807,7 +807,7 @@ view: ventas_analisis {
     label: "Z EXPORT AMOUNT BUD MTD"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
+    sql: ${monto_transaccion} * ${tc_mtd} ;;
 
     filters: {
       field: filtro_mtd
@@ -1106,7 +1106,7 @@ view: ventas_analisis {
     group_label: "Annual"
     label: "NATIONAL AMOUNT YTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
+    sql: ${monto_transaccion} * ${tc_ytd} ;;
 
     filters: {
       field: filtro_ytd
@@ -1128,7 +1128,7 @@ view: ventas_analisis {
     group_label: "Annual"
     label: "EXPORT AMOUNT YTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
+    sql: ${monto_transaccion} * ${tc_ytd} ;;
 
     filters: {
       field: filtro_ytd
@@ -1173,7 +1173,7 @@ view: ventas_analisis {
     group_label: "Annual"
     label: "NATIONAL AMOUNT YTD LY"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd_ly},1) ;;
+    sql: ${monto_transaccion} * ${tc_ytd_ly} ;;
 
     filters: {
       field: filtro_ytd_ly
@@ -1197,7 +1197,7 @@ view: ventas_analisis {
     label: "EXPORT AMOUNT YTD LY"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd_ly},1) ;;
+    sql: ${monto_transaccion} * ${tc_ytd_ly} ;;
 
     filters: {
       field: filtro_ytd_ly
@@ -1258,7 +1258,7 @@ view: ventas_analisis {
     group_label: "Annual"
     label: "Z NATIONAL AMOUNT BUD YTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
+    sql: ${monto_transaccion} * ${tc_ytd} ;;
 
     filters: {
       field: filtro_ytd
@@ -1281,7 +1281,7 @@ view: ventas_analisis {
     label: "Z EXPORT AMOUNT BUD YTD"
 
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
+    sql: ${monto_transaccion} * ${tc_ytd} ;;
 
     filters: {
       field: filtro_ytd
