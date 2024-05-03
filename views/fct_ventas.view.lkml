@@ -85,7 +85,7 @@ view: ventas {
       v.Moneda_Transaccion,
       '' AS Moneda_Conversion,
       0 AS Bandera_Resumen,
-      1 AS Bandera_Total,
+      0 AS Bandera_Total,
       'Z91001' AS Orden,
       0 AS Cantidad,
       0 AS Monto_MXN,
@@ -881,7 +881,12 @@ view: ventas {
     group_label: "Daily"
     label: "DAILY SALES"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_diario},1);;
+    sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_diario}
+         END ;;
 
     filters: {
       field: filtro_dia
@@ -902,119 +907,140 @@ view: ventas {
     group_label: "Monthly"
     label: "NATIONAL AMOUNT MTD"
     type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
-
-    filters: {
-      field: filtro_mtd
-      value: "yes"
-    }
-
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente,national_amount_mtd]
-
-    value_format: "$#,##0.00"
-  }
-
-  measure: export_amount_mtd {
-    #hidden: yes
-    group_label: "Monthly"
-    label: "EXPORT AMOUNT MTD"
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
-
-
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
-    }
-
-    filters: {
-      field: filtro_mtd
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente,export_amount_mtd]
-
-    value_format: "$#,##0.00"
-  }
-
-
-  measure: total_amount_mtd {
-    group_label: "Monthly"
-    label: "TOTAL AMOUNT MTD"
-    type: number
-    sql: ${national_amount_mtd} + ${export_amount_mtd} ;;
-
-    drill_fields: [ nombre_cliente,total_amount_mtd]
-
-    value_format: "$#,##0.00"
-  }
-
-  measure: national_amount_mtd_ly{
-    hidden: yes
-    group_label: "Monthly"
-    label: "NATIONAL AMOUNT MTD LY"
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd_ly},1) ;;
-
-    filters: {
-      field: filtro_mtd_ly
-      value: "yes"
-    }
-
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente,national_amount_mtd_ly]
-
-    value_format: "$#,##0.00"
-  }
-
-  measure: export_amount_mtd_ly {
-    hidden: yes
-    group_label: "Monthly"
-    label: "EXPORT AMOUNT MTD LY"
-
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd_ly},1) ;;
-
-    filters: {
-      field: filtro_mtd_ly
-      value: "yes"
-    }
-
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente,export_amount_mtd_ly]
-
-    value_format: "$#,##0.00"
-  }
-
-  measure:  total_amount_mtd_ly {
-    group_label: "Monthly"
-    label: "TOTAL AMOUNT MTD LY"
-    type: number
-    sql: ${national_amount_mtd_ly} + ${export_amount_mtd_ly} ;;
-
-    drill_fields: [ nombre_cliente, total_amount_mtd_ly]
-
-    value_format: "$#,##0.00"
-  }
-
-  measure: vs_total_amount_mtd_ly {
-    group_label: "Monthly"
-    label: "% VS TOTAL AMOUNT MTD LY"
-    type: number
     sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_mtd}
+         END  ;;
+
+
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente,national_amount_mtd]
+
+      value_format: "$#,##0.00"
+    }
+
+    measure: export_amount_mtd {
+      #hidden: yes
+      group_label: "Monthly"
+      label: "EXPORT AMOUNT MTD"
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_mtd}
+         END ;;
+
+
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
+
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente,export_amount_mtd]
+
+      value_format: "$#,##0.00"
+    }
+
+
+    measure: total_amount_mtd {
+      group_label: "Monthly"
+      label: "TOTAL AMOUNT MTD"
+      type: number
+      sql: ${national_amount_mtd} + ${export_amount_mtd} ;;
+
+      drill_fields: [ nombre_cliente,total_amount_mtd]
+
+      value_format: "$#,##0.00"
+    }
+
+    measure: national_amount_mtd_ly{
+      hidden: yes
+      group_label: "Monthly"
+      label: "NATIONAL AMOUNT MTD LY"
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_mtd_ly}
+         END ;;
+
+      filters: {
+        field: filtro_mtd_ly
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente,national_amount_mtd_ly]
+
+      value_format: "$#,##0.00"
+    }
+
+    measure: export_amount_mtd_ly {
+      hidden: yes
+      group_label: "Monthly"
+      label: "EXPORT AMOUNT MTD LY"
+
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_mtd_ly}
+         END ;;
+
+      filters: {
+        field: filtro_mtd_ly
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente,export_amount_mtd_ly]
+
+      value_format: "$#,##0.00"
+    }
+
+    measure:  total_amount_mtd_ly {
+      group_label: "Monthly"
+      label: "TOTAL AMOUNT MTD LY"
+      type: number
+      sql: ${national_amount_mtd_ly} + ${export_amount_mtd_ly} ;;
+
+      drill_fields: [ nombre_cliente, total_amount_mtd_ly]
+
+      value_format: "$#,##0.00"
+    }
+
+    measure: vs_total_amount_mtd_ly {
+      group_label: "Monthly"
+      label: "% VS TOTAL AMOUNT MTD LY"
+      type: number
+      sql: CASE
           WHEN ${total_amount_mtd} > 0 AND ${total_amount_mtd_ly} = 0 THEN 1
           WHEN ${total_amount_mtd} = 0 AND ${total_amount_mtd_ly} > 0 THEN -1
           WHEN ${total_amount_mtd} > 0 AND ${total_amount_mtd_ly} < 0 THEN ((${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1)*-1
@@ -1022,7 +1048,7 @@ view: ventas {
           ELSE (${total_amount_mtd} /  NULLIF (${total_amount_mtd_ly},0))-1
          END *100;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1033,78 +1059,88 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente, vs_total_amount_mtd_ly, total_amount_mtd, total_amount_mtd_ly]
-  }
-
-  measure: z_national_amount_bud_mtd{
-    group_label: "Monthly"
-    label: "Z NATIONAL AMOUNT BUD MTD"
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
-
-    filters: {
-      field: filtro_mtd
-      value: "yes"
+      drill_fields: [ nombre_cliente, vs_total_amount_mtd_ly, total_amount_mtd, total_amount_mtd_ly]
     }
 
-    filters: {
-      field: tipo_transaccion_pre_nac
-      value: "yes"
+    measure: z_national_amount_bud_mtd{
+      group_label: "Monthly"
+      label: "Z NATIONAL AMOUNT BUD MTD"
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_mtd}
+         END ;;
+
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_pre_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, z_national_amount_bud_mtd]
+
+      value_format: "$#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente, z_national_amount_bud_mtd]
+    measure: z_export_amount_bud_mtd {
+      group_label: "Monthly"
+      label: "Z EXPORT AMOUNT BUD MTD"
 
-    value_format: "$#,##0.00"
-  }
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_mtd}
+         END ;;
 
-  measure: z_export_amount_bud_mtd {
-    group_label: "Monthly"
-    label: "Z EXPORT AMOUNT BUD MTD"
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
 
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_mtd},1) ;;
+      filters: {
+        field: tipo_transaccion_pre_exp
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_mtd
-      value: "yes"
+      drill_fields: [ nombre_cliente, z_export_amount_bud_mtd]
+
+      value_format: "$#,##0.00"
     }
 
-    filters: {
-      field: tipo_transaccion_pre_exp
-      value: "yes"
+    measure:  total_amount_bud_mtd{
+      group_label: "Monthly"
+      label: "TOTAL AMOUNT BUD MTD"
+      type: number
+      sql: ${z_national_amount_bud_mtd} + ${z_export_amount_bud_mtd} ;;
+
+      drill_fields: [ nombre_cliente, total_amount_bud_mtd]
+
+      value_format: "$#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente, z_export_amount_bud_mtd]
 
-    value_format: "$#,##0.00"
-  }
-
-  measure:  total_amount_bud_mtd{
-    group_label: "Monthly"
-    label: "TOTAL AMOUNT BUD MTD"
-    type: number
-    sql: ${z_national_amount_bud_mtd} + ${z_export_amount_bud_mtd} ;;
-
-    drill_fields: [ nombre_cliente, total_amount_bud_mtd]
-
-    value_format: "$#,##0.00"
-  }
-
-
-  measure: vs_total_bud_mtd {
-    group_label: "Monthly"
-    label: "% VS TOTAL BUD MTD"
-    type: number
-    sql: CASE
+    measure: vs_total_bud_mtd {
+      group_label: "Monthly"
+      label: "% VS TOTAL BUD MTD"
+      type: number
+      sql: CASE
           WHEN ${total_amount_mtd} > 0 AND ${total_amount_bud_mtd} = 0 THEN 1
           WHEN ${total_amount_mtd} = 0 AND ${total_amount_bud_mtd} > 0 THEN -1
           WHEN (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1=-1 THEN 0
           ELSE (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1
          END * 100;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1115,133 +1151,133 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente,vs_total_bud_mtd,total_amount_mtd,total_amount_bud_mtd]
+      drill_fields: [ nombre_cliente,vs_total_bud_mtd,total_amount_mtd,total_amount_bud_mtd]
 
-  }
-
-  #MONTHLY-QUANTITY-MTD
-
-  measure: national_qty_mtd {
-    hidden: yes
-    group_label: "Monthly"
-    label: "NATIONAL QTY MTD"
-    type: sum
-    sql: ${cantidad} ;;
-
-    filters: {
-      field: filtro_mtd
-      value: "yes"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
+    #MONTHLY-QUANTITY-MTD
+
+    measure: national_qty_mtd {
+      hidden: yes
+      group_label: "Monthly"
+      label: "NATIONAL QTY MTD"
+      type: sum
+      sql: ${cantidad} ;;
+
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, national_qty_mtd]
+
+      value_format: "#,##0"
     }
 
-    drill_fields: [ nombre_cliente, national_qty_mtd]
+    measure: export_qty_mtd {
+      hidden: yes
+      group_label: "Monthly"
+      label: "EXPORT QTY MTD"
+      type: sum
+      sql: ${cantidad} ;;
 
-    value_format: "#,##0"
-  }
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
 
-  measure: export_qty_mtd {
-    hidden: yes
-    group_label: "Monthly"
-    label: "EXPORT QTY MTD"
-    type: sum
-    sql: ${cantidad} ;;
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_mtd
-      value: "yes"
+      drill_fields: [ nombre_cliente, export_qty_mtd]
+      value_format: "#,##0"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
+    measure: total_qty_mtd {
+      group_label: "Monthly"
+      label: "TOTAL QTY MTD"
+      type: number
+      sql: ${national_qty_mtd} + ${export_qty_mtd} ;;
+      drill_fields: [ nombre_cliente, total_qty_mtd]
+      value_format: "#,##0"
     }
 
-    drill_fields: [ nombre_cliente, export_qty_mtd]
-    value_format: "#,##0"
-  }
+    measure: national_qty_mtd_ly {
+      hidden: yes
+      group_label: "Monthly"
+      label: "NATIONAL QTY MTD LY"
+      type: sum
+      sql: ${cantidad};;
 
-  measure: total_qty_mtd {
-    group_label: "Monthly"
-    label: "TOTAL QTY MTD"
-    type: number
-    sql: ${national_qty_mtd} + ${export_qty_mtd} ;;
-    drill_fields: [ nombre_cliente, total_qty_mtd]
-    value_format: "#,##0"
-  }
+      filters: {
+        field: filtro_mtd_ly
+        value: "yes"
+      }
 
-  measure: national_qty_mtd_ly {
-    hidden: yes
-    group_label: "Monthly"
-    label: "NATIONAL QTY MTD LY"
-    type: sum
-    sql: ${cantidad};;
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_mtd_ly
-      value: "yes"
+      drill_fields: [ nombre_cliente, national_qty_mtd_ly]
+      value_format: "#,##0"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
+
+    measure: export_qty_mtd_ly {
+      hidden: yes
+      group_label: "Monthly"
+      label: "EXPORT QTY MTD LY"
+      type: sum
+      sql: ${cantidad};;
+
+
+      filters: {
+        field: filtro_mtd_ly
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, export_qty_mtd_ly]
+      value_format: "#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente, national_qty_mtd_ly]
-    value_format: "#,##0"
-  }
+    measure: total_qty_mtd_ly {
+      hidden: yes
+      group_label: "Monthly"
+      label: "TOTAL QTY MTD LY"
+      type: number
+      sql: ${national_qty_mtd_ly} + ${export_qty_mtd_ly} ;;
 
-
-  measure: export_qty_mtd_ly {
-    hidden: yes
-    group_label: "Monthly"
-    label: "EXPORT QTY MTD LY"
-    type: sum
-    sql: ${cantidad};;
-
-
-    filters: {
-      field: filtro_mtd_ly
-      value: "yes"
+      drill_fields: [ nombre_cliente, total_qty_mtd_ly]
+      value_format: "#,##0.00"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente, export_qty_mtd_ly]
-    value_format: "#,##0.00"
-  }
-
-  measure: total_qty_mtd_ly {
-    hidden: yes
-    group_label: "Monthly"
-    label: "TOTAL QTY MTD LY"
-    type: number
-    sql: ${national_qty_mtd_ly} + ${export_qty_mtd_ly} ;;
-
-    drill_fields: [ nombre_cliente, total_qty_mtd_ly]
-    value_format: "#,##0.00"
-  }
-
-  measure: vs_total_qty_mtd_ly {
-    group_label: "Monthly"
-    label: "% VS TOTAL QTY MTD LY"
-    type: number
-    sql: CASE
+    measure: vs_total_qty_mtd_ly {
+      group_label: "Monthly"
+      label: "% VS TOTAL QTY MTD LY"
+      type: number
+      sql: CASE
           WHEN ${total_qty_mtd} > 0 AND ${total_qty_mtd_ly} = 0 THEN 1
           WHEN ${total_qty_mtd} = 0 AND ${total_qty_mtd_ly} > 0 THEN -1
           WHEN (${total_qty_mtd}/NULLIF(${total_qty_mtd_ly},0))-1  = 0 THEN 0
           ELSE (${total_qty_mtd}/NULLIF(${total_qty_mtd_ly},0))-1
          END *100;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1252,76 +1288,76 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente, vs_total_qty_mtd_ly,total_qty_mtd,total_qty_mtd_ly]
+      drill_fields: [ nombre_cliente, vs_total_qty_mtd_ly,total_qty_mtd,total_qty_mtd_ly]
 
-  }
-
-  measure: national_qty_bud_mtd {
-    hidden: yes
-    group_label: "Monthly"
-    label: "NATIONAL QTY BUD MTD"
-    type: sum
-    sql: ${cantidad} ;;
-
-    filters: {
-      field: filtro_mtd
-      value: "yes"
     }
 
+    measure: national_qty_bud_mtd {
+      hidden: yes
+      group_label: "Monthly"
+      label: "NATIONAL QTY BUD MTD"
+      type: sum
+      sql: ${cantidad} ;;
 
-    filters: {
-      field: tipo_transaccion_pre_nac
-      value: "yes"
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
+
+
+      filters: {
+        field: tipo_transaccion_pre_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, national_qty_bud_mtd]
     }
 
-    drill_fields: [ nombre_cliente, national_qty_bud_mtd]
-  }
+    measure: export_qty_bud_mtd {
+      hidden: yes
+      group_label: "Monthly"
+      label: "EXPORT QTY BUD MTD"
+      type: sum
+      sql: ${cantidad} ;;
 
-  measure: export_qty_bud_mtd {
-    hidden: yes
-    group_label: "Monthly"
-    label: "EXPORT QTY BUD MTD"
-    type: sum
-    sql: ${cantidad} ;;
+      filters: {
+        field: filtro_mtd
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_mtd
-      value: "yes"
+      filters: {
+        field: tipo_transaccion_pre_exp
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, export_qty_bud_mtd]
+      value_format: "#,##0.00"
     }
 
-    filters: {
-      field: tipo_transaccion_pre_exp
-      value: "yes"
+    measure: total_qty_bud_mtd {
+      group_label: "Monthly"
+      label: "TOTAL QTY BUD MTD"
+      type: number
+      sql: ${national_qty_bud_mtd} + ${export_qty_bud_mtd} ;;
+
+      drill_fields: [ nombre_cliente, total_qty_bud_mtd]
+      value_format: "#,##0"
     }
 
-    drill_fields: [ nombre_cliente, export_qty_bud_mtd]
-    value_format: "#,##0.00"
-  }
-
-  measure: total_qty_bud_mtd {
-    group_label: "Monthly"
-    label: "TOTAL QTY BUD MTD"
-    type: number
-    sql: ${national_qty_bud_mtd} + ${export_qty_bud_mtd} ;;
-
-    drill_fields: [ nombre_cliente, total_qty_bud_mtd]
-    value_format: "#,##0"
-  }
-
-  measure: vs_total_qty_bud_mtd {
-    group_label: "Monthly"
-    label: "% VS TOTAL QTY BUD MTD"
-    type: number
-    sql: CASE
+    measure: vs_total_qty_bud_mtd {
+      group_label: "Monthly"
+      label: "% VS TOTAL QTY BUD MTD"
+      type: number
+      sql: CASE
           WHEN ${total_qty_mtd} > 0 AND ${total_qty_bud_mtd} = 0 THEN 1
           WHEN ${total_qty_mtd} = 0 AND ${total_qty_bud_mtd} > 0 THEN -1
           WHEN (${total_qty_mtd} /  NULLIF (${total_qty_bud_mtd},0))-1= 0 THEN 0
           ELSE (${total_qty_mtd} /  NULLIF (${total_qty_bud_mtd},0))-1
          END *100 ;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1332,134 +1368,154 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente, vs_total_qty_bud_mtd,total_qty_mtd,total_qty_bud_mtd]
+      drill_fields: [ nombre_cliente, vs_total_qty_bud_mtd,total_qty_mtd,total_qty_bud_mtd]
 
-  }
-
-
-  #ANNUAL-MONEY-YTD
-
-  measure: national_amount_ytd {
-    hidden: yes
-    group_label: "Annual"
-    label: "NATIONAL AMOUNT YTD"
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
-
-    filters: {
-      field: filtro_ytd
-      value: "yes"
-    }
-
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente,national_amount_ytd]
-
-    value_format: "$#,##0.00"
-  }
-
-  measure: export_amount_ytd {
-    hidden: yes
-    group_label: "Annual"
-    label: "EXPORT AMOUNT YTD"
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
-
-    filters: {
-      field: filtro_ytd
-      value: "yes"
-    }
-
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente,export_amount_ytd]
-
-    value_format: "$#,##0.00"
-  }
-
-
-  measure: total_amount_ytd {
-    group_label: "Annual"
-    label: "TOTAL AMOUNT YTD"
-    type: number
-    sql: ${national_amount_ytd} + ${export_amount_ytd} ;;
-
-    drill_fields: [ nombre_cliente,total_amount_ytd]
-
-    value_format: "$#,##0.00"
-  }
-
-  measure: national_amount_ytd_ly{
-    hidden: yes
-    group_label: "Annual"
-    label: "NATIONAL AMOUNT YTD LY"
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd_ly},1) ;;
-
-    filters: {
-      field: filtro_ytd_ly
-      value: "yes"
     }
 
 
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
+    #ANNUAL-MONEY-YTD
+
+    measure: national_amount_ytd {
+      hidden: yes
+      group_label: "Annual"
+      label: "NATIONAL AMOUNT YTD"
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_ytd}
+         END ;;
+
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente,national_amount_ytd]
+
+      value_format: "$#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente,national_amount_ytd_ly]
+    measure: export_amount_ytd {
+      hidden: yes
+      group_label: "Annual"
+      label: "EXPORT AMOUNT YTD"
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_ytd}
+         END ;;
 
-    value_format: "$#,##0.00"
-  }
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
 
-  measure: export_amount_ytd_ly {
-    hidden: yes
-    group_label: "Annual"
-    label: "EXPORT AMOUNT YTD LY"
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
 
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd_ly},1) ;;
+      drill_fields: [ nombre_cliente,export_amount_ytd]
 
-    filters: {
-      field: filtro_ytd_ly
-      value: "yes"
+      value_format: "$#,##0.00"
     }
 
 
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
+    measure: total_amount_ytd {
+      group_label: "Annual"
+      label: "TOTAL AMOUNT YTD"
+      type: number
+      sql: ${national_amount_ytd} + ${export_amount_ytd} ;;
+
+      drill_fields: [ nombre_cliente,total_amount_ytd]
+
+      value_format: "$#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente,export_amount_ytd_ly]
+    measure: national_amount_ytd_ly{
+      hidden: yes
+      group_label: "Annual"
+      label: "NATIONAL AMOUNT YTD LY"
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_ytd_ly}
+         END ;;
 
-    value_format: "$#,##0.00"
-  }
+      filters: {
+        field: filtro_ytd_ly
+        value: "yes"
+      }
 
-  measure:  total_amount_ytd_ly {
-    group_label: "Annual"
-    label: "TOTAL AMOUNT YTD LY"
-    type: number
-    sql: ${national_amount_ytd_ly} + ${export_amount_ytd_ly} ;;
 
-    drill_fields: [ nombre_cliente, total_amount_ytd_ly]
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
 
-    value_format: "$#,##0.00"
-  }
+      drill_fields: [ nombre_cliente,national_amount_ytd_ly]
 
-  measure: vs_total_amount_ytd_ly {
-    group_label: "Annual"
-    label: "% VS TOTAL AMOUNT YTD LY"
-    type: number
-    sql: CASE
+      value_format: "$#,##0.00"
+    }
+
+    measure: export_amount_ytd_ly {
+      hidden: yes
+      group_label: "Annual"
+      label: "EXPORT AMOUNT YTD LY"
+
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_ytd_ly}
+         END ;;
+
+      filters: {
+        field: filtro_ytd_ly
+        value: "yes"
+      }
+
+
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente,export_amount_ytd_ly]
+
+      value_format: "$#,##0.00"
+    }
+
+    measure:  total_amount_ytd_ly {
+      group_label: "Annual"
+      label: "TOTAL AMOUNT YTD LY"
+      type: number
+      sql: ${national_amount_ytd_ly} + ${export_amount_ytd_ly} ;;
+
+      drill_fields: [ nombre_cliente, total_amount_ytd_ly]
+
+      value_format: "$#,##0.00"
+    }
+
+    measure: vs_total_amount_ytd_ly {
+      group_label: "Annual"
+      label: "% VS TOTAL AMOUNT YTD LY"
+      type: number
+      sql: CASE
           WHEN ${total_amount_ytd} > 0 AND ${total_amount_ytd_ly} = 0 THEN 1
           WHEN ${total_amount_ytd} = 0 AND ${total_amount_ytd_ly} > 0 THEN -1
           WHEN ${total_amount_ytd} > 0 AND ${total_amount_ytd_ly} < 0 THEN ((${total_amount_ytd} /  NULLIF (${total_amount_ytd_ly},0))-1)*-1
@@ -1467,7 +1523,7 @@ view: ventas {
           ELSE (${total_amount_ytd} /  NULLIF (${total_amount_ytd_ly},0))-1
          END *100;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1478,78 +1534,88 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente, vs_total_amount_ytd_ly, total_amount_ytd, total_amount_ytd_ly]
-  }
-
-  measure: z_national_amount_bud_ytd{
-    group_label: "Annual"
-    label: "Z NATIONAL AMOUNT BUD YTD"
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
-
-    filters: {
-      field: filtro_ytd
-      value: "yes"
+      drill_fields: [ nombre_cliente, vs_total_amount_ytd_ly, total_amount_ytd, total_amount_ytd_ly]
     }
 
-    filters: {
-      field: tipo_transaccion_pre_nac
-      value: "yes"
+    measure: z_national_amount_bud_ytd{
+      group_label: "Annual"
+      label: "Z NATIONAL AMOUNT BUD YTD"
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_ytd}
+         END ;;
+
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_pre_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, z_national_amount_bud_ytd]
+
+      value_format: "$#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente, z_national_amount_bud_ytd]
+    measure: z_export_amount_bud_ytd {
+      group_label: "Annual"
+      label: "Z EXPORT AMOUNT BUD YTD"
 
-    value_format: "$#,##0.00"
-  }
+      type: sum
+      sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_ytd}
+         END ;;
 
-  measure: z_export_amount_bud_ytd {
-    group_label: "Annual"
-    label: "Z EXPORT AMOUNT BUD YTD"
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
 
-    type: sum
-    sql: ${monto_transaccion} * COALESCE(${tc_ytd},1) ;;
+      filters: {
+        field: tipo_transaccion_pre_exp
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_ytd
-      value: "yes"
+      drill_fields: [ nombre_cliente, z_export_amount_bud_ytd]
+
+      value_format: "$#,##0.00"
     }
 
-    filters: {
-      field: tipo_transaccion_pre_exp
-      value: "yes"
+    measure:  total_amount_bud_ytd{
+      group_label: "Annual"
+      label: "TOTAL AMOUNT BUD YTD"
+      type: number
+      sql: ${z_national_amount_bud_ytd} + ${z_export_amount_bud_ytd} ;;
+
+      drill_fields: [ nombre_cliente, total_amount_bud_ytd]
+
+      value_format: "$#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente, z_export_amount_bud_ytd]
 
-    value_format: "$#,##0.00"
-  }
-
-  measure:  total_amount_bud_ytd{
-    group_label: "Annual"
-    label: "TOTAL AMOUNT BUD YTD"
-    type: number
-    sql: ${z_national_amount_bud_ytd} + ${z_export_amount_bud_ytd} ;;
-
-    drill_fields: [ nombre_cliente, total_amount_bud_ytd]
-
-    value_format: "$#,##0.00"
-  }
-
-
-  measure: vs_total_bud_ytd {
-    group_label: "Annual"
-    label: "% VS TOTAL BUD YTD"
-    type: number
-    sql: CASE
+    measure: vs_total_bud_ytd {
+      group_label: "Annual"
+      label: "% VS TOTAL BUD YTD"
+      type: number
+      sql: CASE
           WHEN ${total_amount_ytd} > 0 AND ${total_amount_bud_ytd} = 0 THEN 1
           WHEN ${total_amount_ytd} = 0 AND ${total_amount_bud_ytd} > 0 THEN -1
           WHEN (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1=-1 THEN 0
           ELSE (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1
          END * 100;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1560,135 +1626,135 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente,vs_total_bud_ytd,total_amount_ytd,total_amount_bud_ytd]
+      drill_fields: [ nombre_cliente,vs_total_bud_ytd,total_amount_ytd,total_amount_bud_ytd]
 
-  }
-
-
-
-
-  #ANNUAL-QUANTITY-YTD
-
-  measure: national_qty_ytd {
-    hidden: yes
-    group_label: "Annual"
-    label: "NATIONAL QTY YTD"
-    type: sum
-    sql: ${cantidad} ;;
-
-    filters: {
-      field: filtro_ytd
-      value: "yes"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
+
+
+
+    #ANNUAL-QUANTITY-YTD
+
+    measure: national_qty_ytd {
+      hidden: yes
+      group_label: "Annual"
+      label: "NATIONAL QTY YTD"
+      type: sum
+      sql: ${cantidad} ;;
+
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, national_qty_ytd]
+
+      value_format: "#,##0"
     }
 
-    drill_fields: [ nombre_cliente, national_qty_ytd]
+    measure: export_qty_ytd {
+      hidden: yes
+      group_label: "Annual"
+      label: "EXPORT QTY YTD"
+      type: sum
+      sql: ${cantidad} ;;
 
-    value_format: "#,##0"
-  }
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
 
-  measure: export_qty_ytd {
-    hidden: yes
-    group_label: "Annual"
-    label: "EXPORT QTY YTD"
-    type: sum
-    sql: ${cantidad} ;;
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_ytd
-      value: "yes"
+      drill_fields: [ nombre_cliente, export_qty_ytd]
+      value_format: "#,##0"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
+    measure: total_qty_ytd {
+      group_label: "Annual"
+      label: "TOTAL QTY YTD"
+      type: number
+      sql: ${national_qty_ytd} + ${export_qty_ytd} ;;
+      drill_fields: [ nombre_cliente, total_qty_ytd]
+      value_format: "#,##0"
     }
 
-    drill_fields: [ nombre_cliente, export_qty_ytd]
-    value_format: "#,##0"
-  }
+    measure: national_qty_ytd_ly {
+      hidden: yes
+      group_label: "Annual"
+      label: "NATIONAL QTY YTD LY"
+      type: sum
+      sql: ${cantidad};;
 
-  measure: total_qty_ytd {
-    group_label: "Annual"
-    label: "TOTAL QTY YTD"
-    type: number
-    sql: ${national_qty_ytd} + ${export_qty_ytd} ;;
-    drill_fields: [ nombre_cliente, total_qty_ytd]
-    value_format: "#,##0"
-  }
+      filters: {
+        field: filtro_ytd_ly
+        value: "yes"
+      }
 
-  measure: national_qty_ytd_ly {
-    hidden: yes
-    group_label: "Annual"
-    label: "NATIONAL QTY YTD LY"
-    type: sum
-    sql: ${cantidad};;
+      filters: {
+        field: tipo_transaccion_vta_nac
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_ytd_ly
-      value: "yes"
+      drill_fields: [ nombre_cliente, national_qty_ytd_ly]
+      value_format: "#,##0"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_nac
-      value: "yes"
+
+    measure: export_qty_ytd_ly {
+      hidden: yes
+      group_label: "Annual"
+      label: "EXPORT QTY YTD LY"
+      type: sum
+      sql: ${cantidad};;
+
+      filters: {
+        field: filtro_ytd_ly
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_vta_exp
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, export_qty_ytd_ly]
+      value_format: "#,##0.00"
     }
 
-    drill_fields: [ nombre_cliente, national_qty_ytd_ly]
-    value_format: "#,##0"
-  }
+    measure: total_qty_ytd_ly {
+      hidden: yes
+      group_label: "Annual"
+      label: "TOTAL QTY YTD LY"
+      type: number
+      sql: ${national_qty_ytd_ly} + ${export_qty_ytd_ly} ;;
 
-
-  measure: export_qty_ytd_ly {
-    hidden: yes
-    group_label: "Annual"
-    label: "EXPORT QTY YTD LY"
-    type: sum
-    sql: ${cantidad};;
-
-    filters: {
-      field: filtro_ytd_ly
-      value: "yes"
+      drill_fields: [ nombre_cliente, total_qty_ytd_ly]
+      value_format: "#,##0.00"
     }
 
-    filters: {
-      field: tipo_transaccion_vta_exp
-      value: "yes"
-    }
-
-    drill_fields: [ nombre_cliente, export_qty_ytd_ly]
-    value_format: "#,##0.00"
-  }
-
-  measure: total_qty_ytd_ly {
-    hidden: yes
-    group_label: "Annual"
-    label: "TOTAL QTY YTD LY"
-    type: number
-    sql: ${national_qty_ytd_ly} + ${export_qty_ytd_ly} ;;
-
-    drill_fields: [ nombre_cliente, total_qty_ytd_ly]
-    value_format: "#,##0.00"
-  }
-
-  measure: vs_total_qty_ytd_ly {
-    group_label: "Annual"
-    label: "% VS TOTAL QTY YTD LY"
-    type: number
-    sql: CASE
+    measure: vs_total_qty_ytd_ly {
+      group_label: "Annual"
+      label: "% VS TOTAL QTY YTD LY"
+      type: number
+      sql: CASE
           WHEN ${total_qty_ytd} > 0 AND ${total_qty_ytd_ly} = 0 THEN 1
           WHEN ${total_qty_ytd} = 0 AND ${total_qty_ytd_ly} > 0 THEN -1
           WHEN (${total_qty_ytd}/NULLIF(${total_qty_ytd_ly},0))-1 = 0 THEN 0
           ELSE (${total_qty_ytd}/NULLIF(${total_qty_ytd_ly},0))-1
          END *100;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1699,75 +1765,75 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente, vs_total_qty_ytd_ly,total_qty_ytd,total_qty_ytd_ly]
+      drill_fields: [ nombre_cliente, vs_total_qty_ytd_ly,total_qty_ytd,total_qty_ytd_ly]
 
-  }
-
-  measure: national_qty_bud_ytd {
-    hidden: yes
-    group_label: "Annual"
-    label: "NATIONAL QTY BUD YTD"
-    type: sum
-    sql: ${cantidad} ;;
-
-    filters: {
-      field: filtro_ytd
-      value: "yes"
     }
 
-    filters: {
-      field: tipo_transaccion_pre_nac
-      value: "yes"
+    measure: national_qty_bud_ytd {
+      hidden: yes
+      group_label: "Annual"
+      label: "NATIONAL QTY BUD YTD"
+      type: sum
+      sql: ${cantidad} ;;
+
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
+
+      filters: {
+        field: tipo_transaccion_pre_nac
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, national_qty_bud_ytd]
     }
 
-    drill_fields: [ nombre_cliente, national_qty_bud_ytd]
-  }
+    measure: export_qty_bud_ytd {
+      hidden: yes
+      group_label: "Annual"
+      label: "EXPORT QTY BUD YTD"
+      type: sum
+      sql: ${cantidad} ;;
 
-  measure: export_qty_bud_ytd {
-    hidden: yes
-    group_label: "Annual"
-    label: "EXPORT QTY BUD YTD"
-    type: sum
-    sql: ${cantidad} ;;
+      filters: {
+        field: filtro_ytd
+        value: "yes"
+      }
 
-    filters: {
-      field: filtro_ytd
-      value: "yes"
+      filters: {
+        field: tipo_transaccion_pre_exp
+        value: "yes"
+      }
+
+      drill_fields: [ nombre_cliente, export_qty_bud_ytd]
+      value_format: "#,##0.00"
     }
 
-    filters: {
-      field: tipo_transaccion_pre_exp
-      value: "yes"
+    measure: total_qty_bud_ytd {
+      group_label: "Annual"
+      label: "TOTAL QTY BUD YTD"
+      type: number
+      sql: ${national_qty_bud_ytd} + ${export_qty_bud_ytd} ;;
+
+      drill_fields: [ nombre_cliente, total_qty_bud_ytd]
+      value_format: "#,##0"
     }
 
-    drill_fields: [ nombre_cliente, export_qty_bud_ytd]
-    value_format: "#,##0.00"
-  }
-
-  measure: total_qty_bud_ytd {
-    group_label: "Annual"
-    label: "TOTAL QTY BUD YTD"
-    type: number
-    sql: ${national_qty_bud_ytd} + ${export_qty_bud_ytd} ;;
-
-    drill_fields: [ nombre_cliente, total_qty_bud_ytd]
-    value_format: "#,##0"
-  }
-
-  measure: vs_total_qty_bud_ytd {
-    group_label: "Annual"
-    label: "% VS TOTAL QTY BUD YTD"
-    type: number
-    sql: CASE
+    measure: vs_total_qty_bud_ytd {
+      group_label: "Annual"
+      label: "% VS TOTAL QTY BUD YTD"
+      type: number
+      sql: CASE
           WHEN ${total_qty_ytd} > 0 AND ${total_qty_bud_ytd} = 0 THEN 1
           WHEN ${total_qty_ytd} = 0 AND ${total_qty_bud_ytd} > 0 THEN -1
           WHEN (${total_qty_ytd} /  NULLIF (${total_qty_bud_ytd},0))-1= 0 THEN 0
           ELSE (${total_qty_ytd} /  NULLIF (${total_qty_bud_ytd},0))-1
          END *100 ;;
 
-    html:
+      html:
           {% if value > 0 %}
           <span style="color: green;">{{ rendered_value }}</span></p>
           {% elsif  value < 0 %}
@@ -1778,11 +1844,11 @@ view: ventas {
           {{rendered_value}}
           {% endif %} ;;
 
-    value_format: "0.00\%"
+      value_format: "0.00\%"
 
-    drill_fields: [ nombre_cliente, vs_total_qty_bud_ytd,total_qty_ytd,total_qty_bud_ytd]
+      drill_fields: [ nombre_cliente, vs_total_qty_bud_ytd,total_qty_ytd,total_qty_bud_ytd]
+
+    }
+
 
   }
-
-
-}
