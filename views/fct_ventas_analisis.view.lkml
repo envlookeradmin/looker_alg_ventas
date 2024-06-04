@@ -137,6 +137,15 @@ view: ventas_analisis {
     sql: ${TABLE}.Fecha ;;
   }
 
+  dimension_group: dates {
+    hidden: yes
+    type: time
+    timeframes: [raw, date, week, month, quarter, year]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.Fecha ;;
+  }
+
   dimension: codigo_canal_distribucion {
     hidden: yes
     type: string
