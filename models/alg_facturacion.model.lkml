@@ -40,6 +40,10 @@ explore: ventas {
 
 explore: ventas_analisis {
 
+  #sql_always_having: ${daily_sales} != 0
+  #or ${total_amount_mtd} != 0 or ${total_amount_mtd_ly} != 0 or ${total_amount_bud_mtd} <> 0
+  #or ${total_amount_ytd} != 0 or ${total_amount_ytd_ly} != 0 or ${total_amount_bud_ytd} <> 0 ;;
+
   access_filter: {
     field: ventas_analisis.cluster
     user_attribute: alg_cluster
