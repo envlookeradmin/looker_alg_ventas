@@ -374,7 +374,8 @@ view: ventas {
 
   dimension: codigo_cliente {
     group_label: "Cliente"
-    hidden: yes
+    ##hidden: yes
+    label: "Codigo Cliente"
     type: string
     sql: ${TABLE}.Cliente ;;
   }
