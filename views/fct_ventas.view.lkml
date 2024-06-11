@@ -299,7 +299,7 @@ view: ventas {
 
   dimension: codigo_material {
     group_label: "Material"
-    hidden: yes
+    #hidden: yes
     type: string
     sql: ${TABLE}.Material ;;
   }
