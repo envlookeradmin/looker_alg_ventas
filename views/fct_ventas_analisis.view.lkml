@@ -31,6 +31,7 @@ view: ventas_analisis {
       Organizacion_Ventas,
       Division,
       Unidad_Base,
+      Categoria_Global,
       Categoria,
       SubCategoria,
       v.Moneda_Transaccion,
@@ -306,6 +307,12 @@ view: ventas_analisis {
   dimension: unidad_base {
     type: string
     sql: ${TABLE}.Unidad_Base ;;
+  }
+
+  dimension: categoria_global {
+    label: "GLOBAL CATEGORY"
+    type: string
+    sql: ${TABLE}.Categoria_Global ;;
   }
 
   dimension: categoria {
