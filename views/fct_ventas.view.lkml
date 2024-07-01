@@ -31,6 +31,7 @@ view: ventas {
       Organizacion_Ventas,
       Division,
       Unidad_Base,
+      Categoria_Global,
       Categoria,
       SubCategoria,
       Moneda_Transaccion,
@@ -80,6 +81,7 @@ view: ventas {
       v.Organizacion_Ventas,
       v.Division,
       '' AS Unidad_Base,
+      '' AS Categoria_Global,
       'zTOTAL LOCAL '|| v.Moneda_Transaccion  AS Categoria,
       '' AS SubCategoria,
       v.Moneda_Transaccion,
@@ -97,7 +99,7 @@ view: ventas {
       SUM(v.Monto) AS Monto_Transaccion,
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
       WHERE v.Moneda_Transaccion IN ('CAD','DKK','GTQ')
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
       UNION ALL
 
       --CARGA TOTALES
@@ -130,6 +132,7 @@ view: ventas {
       v.Organizacion_Ventas,
       v.Division,
       '' AS Unidad_Base,
+      '' AS Categoria_Global,
       CASE
       WHEN D_MC.Categoria = 'SUBTOTAL' AND v.Region IN ('Americas')
       THEN D_MC.Categoria||' USD'
@@ -251,7 +254,7 @@ view: ventas {
       END ) = D_TC.Moneda_Conversion
       and v.Tipo_Transaccion = D_TC.Presupuesto
 
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
       ;;
   }
 
@@ -503,6 +506,12 @@ view: ventas {
            WHEN ${cluster} = 'ECW - West' THEN 'A08'
            WHEN ${cluster} = 'ECS - South' THEN 'A09'
          END ;;
+  }
+
+  dimension: categoria_global {
+    label: "GLOBAL CATEGORY"
+    type: string
+    sql: ${TABLE}.Categoria_Global ;;
   }
 
   dimension: categoria {
