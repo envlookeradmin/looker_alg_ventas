@@ -1,4 +1,6 @@
-connection: "envases-eon-alg"
+#connection: "envases-eon-alg"
+
+connection: "@{CONNECTION_NAME}"
 
 # include all the views
 include: "/views/**/*.view.lkml"

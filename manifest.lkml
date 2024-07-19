@@ -1,7 +1,8 @@
 project_name: "alg_facturacion"
 
 constant: CONNECTION_NAME {
-  value: "envases-eon-alg"
+  #value: "envases-eon-alg"
+  value: "envases-alg-analytics-prod"
   export: override_required
 }
 
