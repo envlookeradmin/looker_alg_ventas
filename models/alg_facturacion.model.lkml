@@ -34,5 +34,9 @@ explore: ventas_analisis {
     field: ventas_analisis.cluster
     user_attribute: alg_cluster
   }
+  access_filter: {
+    field: ventas_analisis.id_planta
+    user_attribute: alg_plant
+  }
 
 }
