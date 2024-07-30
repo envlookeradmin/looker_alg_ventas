@@ -24,6 +24,7 @@ view: ventas_analisis {
       Pais_Cliente,
       Ciudad_Cliente,
       Grupo_Cliente,
+      Corporativo,
       Destinatario,
       Nombre_Destinatario,
       Pais_Destinatario,
@@ -267,6 +268,13 @@ view: ventas_analisis {
     group_label: "Cliente"
     type: string
     sql: ${TABLE}.Grupo_Cliente ;;
+  }
+
+  dimension: corporativo {
+    group_label: "Cliente"
+    label: "Corporate"
+    type: string
+    sql: ${TABLE}.Corporativo ;;
   }
 
   dimension: destinatario {

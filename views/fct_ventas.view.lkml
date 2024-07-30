@@ -24,6 +24,7 @@ view: ventas {
       Pais_Cliente,
       Ciudad_Cliente,
       Grupo_Cliente,
+      Corporativo,
       Destinatario,
       Nombre_Destinatario,
       Pais_Destinatario,
@@ -74,6 +75,7 @@ view: ventas {
       v.Pais_Cliente,
       v.Ciudad_Cliente,
       v.Grupo_Cliente,
+      v.Corporativo,
       '' AS Destinatario,
       '' AS Nombre_Destinatario,
       '' AS Pais_Destinatario,
@@ -99,7 +101,7 @@ view: ventas {
       SUM(v.Monto) AS Monto_Transaccion,
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
       WHERE v.Moneda_Transaccion IN ('CAD','DKK','GTQ')
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39
       UNION ALL
 
       --CARGA TOTALES
@@ -125,6 +127,7 @@ view: ventas {
       v.Pais_Cliente,
       v.Ciudad_Cliente,
       v.Grupo_Cliente,
+      v.Corporativo,
       '' AS Destinatario,
       '' AS Nombre_Destinatario,
       '' AS Pais_Destinatario,
@@ -254,7 +257,7 @@ view: ventas {
       END ) = D_TC.Moneda_Conversion
       and v.Tipo_Transaccion = D_TC.Presupuesto
 
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44
       ;;
   }
 
@@ -406,6 +409,12 @@ view: ventas {
     group_label: "Cliente"
     type: string
     sql: ${TABLE}.Grupo_Cliente ;;
+  }
+
+  dimension: corporativo {
+    group_label: "Cliente"
+    type: string
+    sql: ${TABLE}.Corporativo ;;
   }
 
   dimension: destinatario {
