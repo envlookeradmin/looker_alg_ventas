@@ -281,7 +281,7 @@ view: ventas {
   }
 
   dimension_group: dates {
-    hidden: yes
+    hidden: no
     type: time
     timeframes: [raw, date, week, month, quarter, year]
     convert_tz: no
@@ -926,6 +926,67 @@ view: ventas {
     drill_fields: [ nombre_cliente,daily_sales]
 
     value_format: "$#,##0.00"
+  }
+
+  measure: daily_amount {
+    group_label: "Non-accumulated"
+    type: sum
+    sql: CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_diario}
+         END
+        ;;
+
+    filters: [tipo_transaccion: "Venta"]
+
+    drill_fields: [ nombre_cliente,daily_amount]
+
+    value_format: "$#,##0.00"
+
+  }
+
+  measure: daily_quantity {
+    group_label: "Non-accumulated"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Venta"]
+
+    drill_fields: [ nombre_cliente,daily_quantity]
+
+    value_format: "#,##0"
+  }
+
+  measure: daily_bud_amount {
+    group_label: "Non-accumulated"
+    type: sum
+    sql:  CASE
+           WHEN ${bandera_total} = 0
+           THEN ${monto_transaccion}
+           WHEN ${bandera_total} = 1
+           THEN ${monto_transaccion} * ${tc_diario}
+         END ;;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    drill_fields: [ nombre_cliente,daily_bud_amount]
+
+    value_format: "$#,##0.00"
+
+  }
+
+  measure: daily_bud_quantity {
+    group_label: "Non-accumulated"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    drill_fields: [ nombre_cliente,daily_bud_quantity]
+
+    value_format: "#,##0"
   }
 
   #MONTHLY-MONEY-MTD
