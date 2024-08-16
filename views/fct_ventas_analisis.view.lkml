@@ -2,124 +2,171 @@ view: ventas_analisis {
 
   derived_table: {
     sql:
-      SELECT
-      ID_Fuente,
-      Tipo_Transaccion,
-      Fecha,
-      Canal_Distribucion,
-      Material,
-      Descripcion_Material,
-      Grupo_Material,
-      Descripcion_Grupo_Material,
-      Jerarquia,
-      Dimensiones,
-      Planta,
-      Nombre_Planta,
-      Ciudad,
-      Pais,
-      Cluster,
-      Region,
-      Cliente,
-      Nombre_Cliente,
-      Pais_Cliente,
-      Ciudad_Cliente,
-      Grupo_Cliente,
-      Corporativo,
-      Destinatario,
-      Nombre_Destinatario,
-      Pais_Destinatario,
-      Ciudad_Destinatario,
-      Organizacion_Ventas,
-      Division,
-      Unidad_Base,
-      Categoria_Global,
-      Categoria,
-      SubCategoria,
-      v.Moneda_Transaccion,
-      D_MC.Moneda_Conversion,
-      Orden,
-      Cantidad,
-      Monto_MXN,
-      Monto AS Monto_Transaccion,
-      D_TC.Tipo_Cambio,
-      D_TC.Tipo_Cambio_AVG_mensual,
-      D_TC.Tipo_Cambio_AVG_anual,
-      D_TC.Tipo_Cambio_AVG_mensual_LY,
-      D_TC.Tipo_Cambio_AVG_anual_LY
+      WITH
+VTS as (
+  SELECT
+  ID_Fuente,
+  Tipo_Transaccion,
+  Fecha,
+  Canal_Distribucion,
+  Material,
+  Descripcion_Material,
+  Grupo_Material,
+  Descripcion_Grupo_Material,
+  Jerarquia,
+  Dimensiones,
+  Planta,
+  Nombre_Planta,
+  Ciudad,
+  Pais,
+  Cluster,
+  Region,
+  Cliente,
+  Nombre_Cliente,
+  Pais_Cliente,
+  Ciudad_Cliente,
+  Grupo_Cliente,
+  Corporativo,
+  Destinatario,
+  Nombre_Destinatario,
+  Pais_Destinatario,
+  Ciudad_Destinatario,
+  Organizacion_Ventas,
+  Division,
+  Unidad_Base,
+  Categoria_Global,
+  Categoria,
+  SubCategoria,
+  Moneda_Transaccion,
+  Orden,
+  Cantidad,
+  Monto_MXN,
+  Monto AS Monto_Transaccion
+  FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` ),
+  D_MC as (
+  SELECT
+  'MXN' AS Moneda_Conversion
+  UNION ALL
+  SELECT
+  'USD'
+  UNION ALL
+  SELECT
+  'EUR'
+  /*UNION ALL
+  SELECT
+  'DKK'*/ ),
+  D_D as (
+  SELECT
+  Fecha,
+  Moneda_Origen,
+  Moneda_Conversion,
+  CASE
+  WHEN Presupuesto
+  THEN 'Presupuesto'
+  ELSE 'Venta'
+  END AS Presupuesto,
+  CASE
+  WHEN Tipo_Cambio < 0
+  THEN (Tipo_Cambio * -1)
+  ELSE Tipo_Cambio
+  END AS Tipo_Cambio,
+  avg(CASE
+  WHEN Tipo_Cambio < 0
+  THEN (Tipo_Cambio * -1)
+  ELSE Tipo_Cambio
+  END)
+  over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+  order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_mensual,
+  avg(CASE
+  WHEN Tipo_Cambio < 0
+  THEN (Tipo_Cambio * -1)
+  ELSE Tipo_Cambio
+  END)
+  over(partition by extract(year from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+  order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_anual
+  FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`),
+  D_TC as (
+  select
+  Moneda_Origen,
+  Moneda_Conversion,
+  Presupuesto,
+  MAX( CASE
+  WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+  THEN Tipo_Cambio
+  END ) AS Tipo_Cambio,
+  MAX( CASE
+  WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+  THEN Tipo_Cambio_AVG_mensual
+  END ) AS Tipo_Cambio_AVG_mensual,
+  MAX( CASE
+  WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+  THEN Tipo_Cambio_AVG_anual
+  END ) AS Tipo_Cambio_AVG_anual,
+  MAX( CASE
+  WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
+  THEN Tipo_Cambio_AVG_mensual
+  END ) AS Tipo_Cambio_AVG_mensual_LY,
+  MAX( CASE
+  WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
+  THEN Tipo_Cambio_AVG_anual
+  END ) AS Tipo_Cambio_AVG_anual_LY
+  from D_D
+  GROUP BY 1,2,3)
 
-      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v cross join
-      ( SELECT
-      'MXN' AS Moneda_Conversion
-      UNION ALL
-      SELECT
-      'USD'
-      UNION ALL
-      SELECT
-      'EUR' ) AS D_MC left join
-
-      ( WITH dim_divisas as (
-      SELECT
-      Fecha,
-      Moneda_Origen,
-      Moneda_Conversion,
-      CASE
-      WHEN Presupuesto
-      THEN 'Presupuesto'
-      ELSE 'Venta'
-      END AS Presupuesto,
-      CASE
-        WHEN Tipo_Cambio < 0
-        THEN (Tipo_Cambio * -1)
-        ELSE Tipo_Cambio
-      END AS Tipo_Cambio,
-      avg(CASE
-        WHEN Tipo_Cambio < 0
-        THEN (Tipo_Cambio * -1)
-        ELSE Tipo_Cambio
-      END)
-      over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
-      order by Fecha, Moneda_Origen, Moneda_Conversion) Tipo_Cambio_AVG_mensual,
-      avg(CASE
-        WHEN Tipo_Cambio < 0
-        THEN (Tipo_Cambio * -1)
-        ELSE Tipo_Cambio
-      END)
-      over(partition by extract(year from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
-      order by Fecha, Moneda_Origen, Moneda_Conversion) Tipo_Cambio_AVG_anual
-      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`
-      )
-
-      select
-      Moneda_Origen,
-      Moneda_Conversion,
-      Presupuesto,
-      MAX( CASE
-      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
-      THEN Tipo_Cambio
-      END ) AS Tipo_Cambio,
-      MAX( CASE
-      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
-      THEN Tipo_Cambio_AVG_mensual
-      END ) AS Tipo_Cambio_AVG_mensual,
-      MAX( CASE
-      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
-      THEN Tipo_Cambio_AVG_anual
-      END ) AS Tipo_Cambio_AVG_anual,
-      MAX( CASE
-      WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
-      THEN Tipo_Cambio_AVG_mensual
-      END ) AS Tipo_Cambio_AVG_mensual_LY,
-      MAX( CASE
-      WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
-      THEN Tipo_Cambio_AVG_anual
-      END ) AS Tipo_Cambio_AVG_anual_LY
-      from dim_divisas
-      GROUP BY 1,2,3
-      ) D_TC ON v.Moneda_Transaccion = D_TC.Moneda_Origen
-      and D_MC.Moneda_Conversion = D_TC.Moneda_Conversion
-      and v.Tipo_Transaccion = D_TC.Presupuesto
-
-      ;;
+  SELECT
+  ID_Fuente,
+  Tipo_Transaccion,
+  VTS.Fecha,
+  Canal_Distribucion,
+  Material,
+  Descripcion_Material,
+  Grupo_Material,
+  Descripcion_Grupo_Material,
+  Jerarquia,
+  Dimensiones,
+  Planta,
+  Nombre_Planta,
+  Ciudad,
+  Pais,
+  Cluster,
+  Region,
+  Cliente,
+  Nombre_Cliente,
+  Pais_Cliente,
+  Ciudad_Cliente,
+  Grupo_Cliente,
+  Corporativo,
+  Destinatario,
+  Nombre_Destinatario,
+  Pais_Destinatario,
+  Ciudad_Destinatario,
+  Organizacion_Ventas,
+  Division,
+  Unidad_Base,
+  Categoria_Global,
+  Categoria,
+  SubCategoria,
+  VTS.Moneda_Transaccion,
+  D_MC.Moneda_Conversion,
+  Orden,
+  Cantidad,
+  Monto_MXN,
+  Monto_Transaccion,
+  D_TC.Tipo_Cambio,
+  D_TC.Tipo_Cambio_AVG_mensual,
+  D_TC.Tipo_Cambio_AVG_anual,
+  D_TC.Tipo_Cambio_AVG_mensual_LY,
+  D_TC.Tipo_Cambio_AVG_anual_LY,
+  D_D.Tipo_Cambio as Tipo_Cambio_SA
+  FROM VTS cross join D_MC
+  left join D_TC ON VTS.Moneda_Transaccion = D_TC.Moneda_Origen
+  and D_MC.Moneda_Conversion = D_TC.Moneda_Conversion
+  and VTS.Tipo_Transaccion = D_TC.Presupuesto
+  left join D_D ON VTS.Moneda_Transaccion = D_D.Moneda_Origen
+  and D_MC.Moneda_Conversion = D_D.Moneda_Conversion
+  and VTS.Tipo_Transaccion = D_D.Presupuesto
+  and VTS.Fecha = D_D.Fecha
+  ;;
   }
 
   dimension: id_fuente {
@@ -140,7 +187,7 @@ view: ventas_analisis {
   }
 
   dimension_group: dates {
-    hidden: yes
+    hidden: no
     type: time
     timeframes: [raw, date, week, month, quarter, year]
     convert_tz: no
@@ -478,6 +525,14 @@ view: ventas_analisis {
     value_format: "#,##0.00"
   }
 
+  dimension: tc_diario_sa {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.Tipo_Cambio_SA ;;
+
+    value_format: "#,##0.00"
+  }
+
   dimension: tc_mtd {
     hidden: yes
     type: number
@@ -643,6 +698,75 @@ view: ventas_analisis {
     filters: [tipo_transaccion: "Venta"]
 
     drill_fields: [ nombre_cliente,daily_sales_qty]
+
+    value_format: "#,##0"
+  }
+
+  measure: daily_bud_sales {
+    hidden: yes
+    group_label: "Daily"
+    label: "DAILY BUD SALES"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario} ;;
+
+    filters: {
+      field: filtro_dia
+      value: "yes"
+    }
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    drill_fields: [ nombre_cliente,daily_bud_sales]
+
+    value_format: "$#,##0.00"
+  }
+
+  measure: daily_amount {
+    group_label: "Non-accumulated"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario_sa}  ;;
+
+    filters: [tipo_transaccion: "Venta"]
+
+    drill_fields: [ nombre_cliente,daily_amount]
+
+    value_format: "$#,##0.00"
+
+  }
+
+  measure: daily_quantity {
+    group_label: "Non-accumulated"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Venta"]
+
+    drill_fields: [ nombre_cliente,daily_quantity]
+
+    value_format: "#,##0"
+  }
+
+  measure: daily_bud_amount {
+    group_label: "Non-accumulated"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario_sa} ;;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    drill_fields: [ nombre_cliente,daily_bud_amount]
+
+    value_format: "$#,##0.00"
+
+  }
+
+  measure: daily_bud_quantity {
+    group_label: "Non-accumulated"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    drill_fields: [ nombre_cliente,daily_bud_quantity]
 
     value_format: "#,##0"
   }
