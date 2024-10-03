@@ -52,9 +52,9 @@ VTS as (
   UNION ALL
   SELECT
   'EUR'
-  /*UNION ALL
+  UNION ALL
   SELECT
-  'DKK'*/ ),
+  'DKK' ),
   D_D as (
   SELECT
   Fecha,
