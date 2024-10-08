@@ -513,6 +513,20 @@ VTS as (
       and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)   ;;
   }
 
+ #Filtro personalizado
+
+  dimension: filtro_desde_hasta{
+    description: "Filtro para acotar la información desde los 2 años anteriores y año actual de acuerdo a la fecha seleccionada en el reporte, Sales by month"
+    type: number
+    sql: CASE
+            --WHEN DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %}))-2 AS STRING),"-01-01")  AS DATE)
+            WHEN DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) >= CAST({% date_start date_filter %} AS DATE)
+            AND DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) <= CAST({% date_end date_filter %} AS DATE) THEN 1
+            ELSE 0
+           END
+                ;;
+  }
+
 
 ################### dimensiones_tipo_cambio
 
@@ -729,6 +743,20 @@ VTS as (
     filters: [tipo_transaccion: "Venta"]
 
     drill_fields: [ nombre_cliente,daily_amount]
+
+    value_format: "$#,##0.00"
+
+  }
+
+  measure: month_amount {
+    group_label: "Non-accumulated"
+    label: "Sales"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario_sa}  ;;
+
+    filters: [tipo_transaccion: "Venta"]
+
+    drill_fields: [ nombre_cliente,month_amount]
 
     value_format: "$#,##0.00"
 
