@@ -523,8 +523,7 @@ VTS as (
             WHEN DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) >= CAST({% date_start date_filter %} AS DATE)
             AND DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) <= CAST({% date_end date_filter %} AS DATE) THEN 1
             ELSE 0
-           END
-                ;;
+           END;;
   }
 
 
