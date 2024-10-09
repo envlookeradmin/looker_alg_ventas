@@ -343,6 +343,13 @@ VTS as (
     sql: ${TABLE}.Pais_Destinatario ;;
   }
 
+  dimension: pais_destinatario_ {
+    group_label: "Destinatario"
+    label: "Addressee Country"
+    type: string
+    sql: COALESCE(${TABLE}.Pais_Destinatario, 'Indefinite') ;;
+  }
+
   dimension: ciudad_destinatario {
     group_label: "Destinatario"
     type: string
@@ -516,14 +523,14 @@ VTS as (
  #Filtro personalizado
 
   dimension: filtro_desde_hasta{
-    description: "Filtro para acotar la información desde los 2 años anteriores y año actual de acuerdo a la fecha seleccionada en el reporte, Sales by month"
+    description: "Filtro para acotar la información de acuerdo a la fecha seleccionada en el reporte, Sales by month"
     type: number
     sql: CASE
             --WHEN DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) >= CAST(CONCAT(CAST(EXTRACT(YEAR FROM DATE ({% date_start date_filter %}))-2 AS STRING),"-01-01")  AS DATE)
             WHEN DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) >= CAST({% date_start date_filter %} AS DATE)
             AND DATE_TRUNC(CAST(${dates_date} AS DATE),DAY) <= CAST({% date_end date_filter %} AS DATE) THEN 1
             ELSE 0
-           END;;
+           END ;;
   }
 
 
@@ -755,7 +762,18 @@ VTS as (
 
     filters: [tipo_transaccion: "Venta"]
 
-    drill_fields: [ nombre_cliente,month_amount]
+    link: {
+      label: "Plant Country - Addressee Country"
+      url: "https://envasesdirecto.cloud.looker.com/dashboards/360?Date={{ _filters['ventas_analisis.date_filter'] | url_encode }}&Region={{ _filters['ventas_analisis.region'] | url_encode }}&Cluster={{ _filters['ventas_analisis.cluster'] | url_encode }}&Country={{ _filters['ventas_analisis.pais'] | url_encode }}&Sales+Org={{ _filters['ventas_analisis.organizacion_ventas'] | url_encode }}&Plant={{ _filters['ventas_analisis.nombre_planta'] | url_encode }}&Client={{ _filters['ventas_analisis.nombre_cliente'] | url_encode }}&Category={{ _filters['ventas_analisis.categoria'] | url_encode }}&Global+Category={{ _filters['ventas_analisis.categoria_global'] | url_encode }}&Addressee+Country={{ ventas_analisis.pais_destinatario._value | url_encode }}&Currency={{ _filters['ventas_analisis.moneda_conversion'] | url_encode }}"
+
+    }
+
+    link: {
+      label: "Cluster - Addressee Country"
+      url: "https://envasesdirecto.cloud.looker.com/dashboards/361?Date={{ _filters['ventas_analisis.date_filter'] | url_encode }}&Region={{ _filters['ventas_analisis.region'] | url_encode }}&Cluster={{ _filters['ventas_analisis.cluster'] | url_encode }}&Country={{ _filters['ventas_analisis.pais'] | url_encode }}&Sales+Org={{ _filters['ventas_analisis.organizacion_ventas'] | url_encode }}&Plant={{ _filters['ventas_analisis.nombre_planta'] | url_encode }}&Client={{ _filters['ventas_analisis.nombre_cliente'] | url_encode }}&Category={{ _filters['ventas_analisis.categoria'] | url_encode }}&Global+Category={{ _filters['ventas_analisis.categoria_global'] | url_encode }}&Addressee+Country={{ ventas_analisis.pais_destinatario._value | url_encode }}&Currency={{ _filters['ventas_analisis.moneda_conversion'] | url_encode }}"
+    }
+
+    #drill_fields: [ nombre_cliente,month_amount]
 
     value_format: "$#,##0.00"
 
