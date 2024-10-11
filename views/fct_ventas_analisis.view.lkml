@@ -347,7 +347,11 @@ VTS as (
     group_label: "Destinatario"
     label: "Addressee Country"
     type: string
-    sql: COALESCE(${TABLE}.Pais_Destinatario, 'Indefinite') ;;
+    sql: CASE
+           WHEN ${TABLE}.Pais_Destinatario IS NULL THEN 'Undefined'
+           WHEN ${TABLE}.Pais_Destinatario = '' THEN 'Undefined'
+           ELSE ${TABLE}.Pais_Destinatario
+         END ;;
   }
 
   dimension: ciudad_destinatario {
