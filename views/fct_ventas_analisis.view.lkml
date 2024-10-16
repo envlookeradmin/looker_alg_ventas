@@ -321,7 +321,15 @@ VTS as (
     group_label: "Cliente"
     label: "Corporate"
     type: string
-    sql: ${TABLE}.Corporativo ;;
+    sql: CASE
+         WHEN ${TABLE}.Corporativo IS NULL
+         THEN ${TABLE}.Nombre_Cliente
+         WHEN ${TABLE}.Corporativo = ''
+         THEN ${TABLE}.Nombre_Cliente
+         ELSE ${TABLE}.Corporativo
+         END;;
+
+    order_by_field: corporativo
   }
 
   dimension: destinatario {
