@@ -414,7 +414,11 @@ view: ventas {
   dimension: corporativo {
     group_label: "Cliente"
     type: string
-    sql: ${TABLE}.Corporativo ;;
+    sql: CASE
+         WHEN ${TABLE}.Corporativo IS NULL OR ${TABLE}.Corporativo = ''
+         THEN ${TABLE}.Nombre_Cliente
+         ELSE ${TABLE}.Corporativo
+         END ;;
   }
 
   dimension: destinatario {

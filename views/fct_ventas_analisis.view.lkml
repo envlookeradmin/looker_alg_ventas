@@ -322,14 +322,10 @@ VTS as (
     label: "Corporate"
     type: string
     sql: CASE
-         WHEN ${TABLE}.Corporativo IS NULL
-         THEN ${TABLE}.Nombre_Cliente
-         WHEN ${TABLE}.Corporativo = ''
+         WHEN ${TABLE}.Corporativo IS NULL OR ${TABLE}.Corporativo = ''
          THEN ${TABLE}.Nombre_Cliente
          ELSE ${TABLE}.Corporativo
-         END;;
-
-    order_by_field: corporativo
+         END ;;
   }
 
   dimension: destinatario {
