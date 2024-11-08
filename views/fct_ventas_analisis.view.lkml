@@ -287,7 +287,7 @@ VTS as (
 
   dimension: codigo_cliente {
     group_label: "Cliente"
-    hidden: yes
+    hidden: no
     type: string
     sql: ${TABLE}.Cliente ;;
   }
