@@ -65,23 +65,11 @@ VTS as (
   THEN 'Presupuesto'
   ELSE 'Venta'
   END AS Presupuesto,
-  CASE
-  WHEN Tipo_Cambio < 0
-  THEN (Tipo_Cambio * -1)
-  ELSE Tipo_Cambio
-  END AS Tipo_Cambio,
-  avg(CASE
-  WHEN Tipo_Cambio < 0
-  THEN (Tipo_Cambio * -1)
-  ELSE Tipo_Cambio
-  END)
+  Tipo_Cambio,
+  avg(Tipo_Cambio)
   over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
   order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_mensual,
-  avg(CASE
-  WHEN Tipo_Cambio < 0
-  THEN (Tipo_Cambio * -1)
-  ELSE Tipo_Cambio
-  END)
+  avg(Tipo_Cambio)
   over(partition by extract(year from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
   order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_anual
   FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`),
