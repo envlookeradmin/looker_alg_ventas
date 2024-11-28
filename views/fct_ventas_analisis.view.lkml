@@ -38,7 +38,7 @@ VTS as (
   Categoria,
   SubCategoria,
   Moneda_Transaccion,
-  Orden,
+  --Orden,
   Cantidad,
   Monto_MXN,
   Monto AS Monto_Transaccion
@@ -136,7 +136,7 @@ VTS as (
   SubCategoria,
   VTS.Moneda_Transaccion,
   D_MC.Moneda_Conversion,
-  Orden,
+  --Orden,
   Cantidad,
   Monto_MXN,
   Monto_Transaccion,
@@ -378,13 +378,6 @@ VTS as (
     type: string
     sql: ${TABLE}.Categoria ;;
 
-    #order_by_field: orden_categoria
-  }
-
-  dimension: orden_categoria {
-    hidden: yes
-    type: string
-    sql: ${TABLE}.Orden|| ${cluster}|| ${subcategoria} ;;
   }
 
   dimension: subcategoria {
@@ -392,13 +385,6 @@ VTS as (
     type: string
     sql: ${TABLE}.SubCategoria ;;
 
-  }
-
-
-  dimension: orden_subcategoria {
-    hidden: yes
-    type: string
-    sql: SUBSTRING(${TABLE}.Orden,4,3) || ${cluster} || ${categoria} ;;
   }
 
 

@@ -39,7 +39,7 @@ view: ventas {
       '' AS Moneda_Conversion,
       1 AS Bandera_Resumen,
       0 AS Bandera_Total,
-      Orden,
+      --Orden,
       Cantidad,
       Monto_MXN,
       NULL AS Tipo_Cambio,
@@ -90,7 +90,7 @@ view: ventas {
       '' AS Moneda_Conversion,
       0 AS Bandera_Resumen,
       0 AS Bandera_Total,
-      'Z91001' AS Orden,
+      --'Z91001' AS Orden,
       0 AS Cantidad,
       0 AS Monto_MXN,
       NULL AS Tipo_Cambio,
@@ -101,7 +101,7 @@ view: ventas {
       SUM(v.Monto) AS Monto_Transaccion,
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
       WHERE v.Moneda_Transaccion IN ('CAD','DKK','GTQ')
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
       UNION ALL
 
       --CARGA TOTALES
@@ -158,7 +158,7 @@ view: ventas {
       ELSE 0
       END AS Bandera_Resumen,
       1 AS Bandera_Total,
-      D_MC.Orden AS Orden,
+      --D_MC.Orden AS Orden,
       0 AS Cantidad,
       0 AS Monto_MXN,
       D_TC.Tipo_Cambio,
@@ -171,23 +171,19 @@ view: ventas {
       cross join
       ( SELECT
       'MXN' AS Moneda_Conversion,
-      'zTOTAL MXN' AS Categoria,
-      'Z92001' AS Orden
+      'zTOTAL MXN' AS Categoria
       UNION ALL
       SELECT
       'USD' AS Moneda_Conversion,
-      'zTOTAL USD' AS Categoria,
-      'Z93001' AS Orden
+      'zTOTAL USD' AS Categoria
       UNION ALL
       SELECT
       'EUR' AS Moneda_Conversion,
-      'zTOTAL EUR' AS Categoria,
-      'Z94001' AS Orden
+      'zTOTAL EUR' AS Categoria
       UNION ALL
       SELECT
       '' AS Moneda_Conversion,
-      'SUBTOTAL' AS Categoria,
-      'Z93001' AS Orden ) AS D_MC left join
+      'SUBTOTAL' AS Categoria ) AS D_MC left join
 
       ( WITH dim_divisas as (
       SELECT
@@ -245,7 +241,7 @@ view: ventas {
       END ) = D_TC.Moneda_Conversion
       and v.Tipo_Transaccion = D_TC.Presupuesto
 
-      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44
+      GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
       ;;
   }
 
@@ -600,14 +596,6 @@ view: ventas {
       <p style="">{{ rendered_value }}</p>
       {% endif %} ;;
 
-    #order_by_field: orden_categoria
-  }
-
-  dimension: orden_categoria {
-    hidden: yes
-    type: string
-    sql: ${TABLE}.Orden;;
-
   }
 
   dimension: subcategoria {
@@ -615,13 +603,6 @@ view: ventas {
     type: string
     sql: ${TABLE}.SubCategoria ;;
 
-  }
-
-
-  dimension: orden_subcategoria {
-    hidden: yes
-    type: string
-    sql: SUBSTRING(${TABLE}.Orden,4,3) || ${cluster} || ${categoria} ;;
   }
 
 
