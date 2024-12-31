@@ -1,108 +1,117 @@
-view: ventas_analisis {
+view: ventas_consolidado {
 
   derived_table: {
     sql:
       WITH
-VTS as (
-  SELECT
-  ID_Fuente,
-  Tipo_Transaccion,
-  Fecha,
-  Canal_Distribucion,
-  Material,
-  Descripcion_Material,
-  Grupo_Material,
-  Descripcion_Grupo_Material,
-  Jerarquia,
-  Dimensiones,
-  Planta,
-  Nombre_Planta,
-  Ciudad,
-  Pais,
-  Cluster,
-  Region,
-  Cliente,
-  Nombre_Cliente,
-  Pais_Cliente,
-  Ciudad_Cliente,
-  Grupo_Cliente,
-  Corporativo,
-  Destinatario,
-  Nombre_Destinatario,
-  Pais_Destinatario,
-  Ciudad_Destinatario,
-  Organizacion_Ventas,
-  Sector,
-  Unidad_Base,
-  Categoria_Global,
-  Categoria,
-  SubCategoria,
-  Moneda_Transaccion,
-  Cantidad,
-  Monto_MXN,
-  Monto AS Monto_Transaccion
-  FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar`
-  WHERE Division = 'ALG' ),
-  D_MC as (
-  SELECT
-  'MXN' AS Moneda_Conversion
-  UNION ALL
-  SELECT
-  'USD'
-  UNION ALL
-  SELECT
-  'EUR'
-  UNION ALL
-  SELECT
-  'DKK' ),
-  D_D as (
-  SELECT
-  Fecha,
-  Moneda_Origen,
-  Moneda_Conversion,
-  CASE
-  WHEN Presupuesto
-  THEN 'Presupuesto'
-  ELSE 'Venta'
-  END AS Presupuesto,
-  Tipo_Cambio,
-  avg(Tipo_Cambio)
-  over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
-  order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_mensual,
-  avg(Tipo_Cambio)
-  over(partition by extract(year from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
-  order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_anual,
-  avg(Tipo_Cambio)
-  over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
-  order by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_periodo
-  FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`),
-  D_TC as (
-  select
-  Moneda_Origen,
-  Moneda_Conversion,
-  Presupuesto,
-  MAX( CASE
-  WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
-  THEN Tipo_Cambio
-  END ) AS Tipo_Cambio,
-  MAX( CASE
-  WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
-  THEN Tipo_Cambio_AVG_mensual
-  END ) AS Tipo_Cambio_AVG_mensual,
-  MAX( CASE
-  WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
-  THEN Tipo_Cambio_AVG_anual
-  END ) AS Tipo_Cambio_AVG_anual,
-  MAX( CASE
-  WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
-  THEN Tipo_Cambio_AVG_mensual
-  END ) AS Tipo_Cambio_AVG_mensual_LY,
-  MAX( CASE
-  WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
-  THEN Tipo_Cambio_AVG_anual
-  END ) AS Tipo_Cambio_AVG_anual_LY
-  from D_D
-  GROUP BY 1,2,3)
+    VTS as (
+      SELECT
+      ID_Fuente,
+      Tipo_Transaccion,
+      Fecha,
+      Canal_Distribucion,
+      Material,
+      Descripcion_Material,
+      Grupo_Material,
+      Descripcion_Grupo_Material,
+      Jerarquia,
+      Dimensiones,
+      Planta,
+      Nombre_Planta,
+      Ciudad,
+      Pais,
+      Cluster,
+      Region,
+      Cliente,
+      Nombre_Cliente,
+      Pais_Cliente,
+      Ciudad_Cliente,
+      Grupo_Cliente,
+      Corporativo,
+      Destinatario,
+      Nombre_Destinatario,
+      Pais_Destinatario,
+      Ciudad_Destinatario,
+      Organizacion_Ventas,
+      Division,
+      Sector,
+      Unidad_Base,
+      Categoria_Global,
+      Categoria,
+      SubCategoria,
+      Moneda_Transaccion,
+      Cantidad,
+      Monto_MXN,
+      Monto AS Monto_Transaccion
+      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar`),
+      D_MC as (
+      SELECT
+      'MXN' AS Moneda_Conversion
+      UNION ALL
+      SELECT
+      'USD'
+      UNION ALL
+      SELECT
+      'EUR'
+      UNION ALL
+      SELECT
+      'DKK' ),
+      D_D as (
+      SELECT
+      Fecha,
+      Moneda_Origen,
+      Moneda_Conversion,
+      CASE
+      WHEN Presupuesto
+      THEN 'Presupuesto'
+      ELSE 'Venta'
+      END AS Presupuesto,
+      CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END AS Tipo_Cambio,
+      avg(CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END)
+      over(partition by extract(year from Fecha), extract(month from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+      order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_mensual,
+      avg(CASE
+      WHEN Tipo_Cambio < 0
+      THEN (Tipo_Cambio * -1)
+      ELSE Tipo_Cambio
+      END)
+      over(partition by extract(year from Fecha), Moneda_Origen, Moneda_Conversion, Presupuesto
+      order by Fecha, Moneda_Origen, Moneda_Conversion) as Tipo_Cambio_AVG_anual
+      FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Dim_Divisas`),
+      D_TC as (
+      select
+      Moneda_Origen,
+      Moneda_Conversion,
+      Presupuesto,
+      MAX( CASE
+      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+      THEN Tipo_Cambio
+      END ) AS Tipo_Cambio,
+      MAX( CASE
+      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+      THEN Tipo_Cambio_AVG_mensual
+      END ) AS Tipo_Cambio_AVG_mensual,
+      MAX( CASE
+      WHEN Fecha = CAST( {% date_start date_filter %} AS DATE)
+      THEN Tipo_Cambio_AVG_anual
+      END ) AS Tipo_Cambio_AVG_anual,
+      MAX( CASE
+      WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
+      THEN Tipo_Cambio_AVG_mensual
+      END ) AS Tipo_Cambio_AVG_mensual_LY,
+      MAX( CASE
+      WHEN Fecha = DATE_ADD( CAST( {% date_start date_filter %} AS DATE),INTERVAL -1 year)
+      THEN Tipo_Cambio_AVG_anual
+      END ) AS Tipo_Cambio_AVG_anual_LY
+      from D_D
+      GROUP BY 1,2,3)
 
       SELECT
       ID_Fuente,
@@ -132,6 +141,7 @@ VTS as (
       Pais_Destinatario,
       Ciudad_Destinatario,
       Organizacion_Ventas,
+      Division,
       Sector,
       Unidad_Base,
       Categoria_Global,
@@ -147,8 +157,7 @@ VTS as (
       D_TC.Tipo_Cambio_AVG_anual,
       D_TC.Tipo_Cambio_AVG_mensual_LY,
       D_TC.Tipo_Cambio_AVG_anual_LY,
-      D_D.Tipo_Cambio as Tipo_Cambio_SA,
-      D_D.Tipo_Cambio_AVG_periodo as Tipo_Cambio_AVG_periodo
+      D_D.Tipo_Cambio as Tipo_Cambio_SA
       FROM VTS cross join D_MC
       left join D_TC ON VTS.Moneda_Transaccion = D_TC.Moneda_Origen
       and D_MC.Moneda_Conversion = D_TC.Moneda_Conversion
@@ -157,7 +166,7 @@ VTS as (
       and D_MC.Moneda_Conversion = D_D.Moneda_Conversion
       and VTS.Tipo_Transaccion = D_D.Presupuesto
       and VTS.Fecha = D_D.Fecha
-  ;;
+      ;;
   }
 
   dimension: id_fuente {
@@ -278,7 +287,7 @@ VTS as (
 
   dimension: codigo_cliente {
     group_label: "Cliente"
-    hidden: no
+    hidden: yes
     type: string
     sql: ${TABLE}.Cliente ;;
   }
@@ -312,11 +321,7 @@ VTS as (
     group_label: "Cliente"
     label: "Corporate"
     type: string
-    sql: CASE
-         WHEN ${TABLE}.Corporativo IS NULL OR ${TABLE}.Corporativo = ''
-         THEN ${TABLE}.Nombre_Cliente
-         ELSE ${TABLE}.Corporativo
-         END ;;
+    sql: ${TABLE}.Corporativo ;;
   }
 
   dimension: destinatario {
@@ -362,6 +367,11 @@ VTS as (
 
   dimension: division {
     type: string
+    sql: ${TABLE}.Division ;;
+  }
+
+  dimension: sector {
+    type: string
     sql: ${TABLE}.Sector ;;
   }
 
@@ -380,7 +390,6 @@ VTS as (
     label: "CATEGORY"
     type: string
     sql: ${TABLE}.Categoria ;;
-
   }
 
   dimension: subcategoria {
@@ -389,7 +398,6 @@ VTS as (
     sql: ${TABLE}.SubCategoria ;;
 
   }
-
 
   dimension: moneda_transaccion {
     type: string
@@ -505,7 +513,7 @@ VTS as (
       and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)   ;;
   }
 
- #Filtro personalizado
+  #Filtro personalizado
 
   dimension: filtro_desde_hasta{
     description: "Filtro para acotar la información de acuerdo a la fecha seleccionada en el reporte, Sales by month"
@@ -749,13 +757,13 @@ VTS as (
 
     link: {
       label: "Plant Country - Addressee Country"
-      url: "https://envasesdirecto.cloud.looker.com/dashboards/360?Date={{ _filters['ventas_analisis.date_filter'] | url_encode }}&Region={{ _filters['ventas_analisis.region'] | url_encode }}&Cluster={{ _filters['ventas_analisis.cluster'] | url_encode }}&Country={{ _filters['ventas_analisis.pais'] | url_encode }}&Sales+Org={{ _filters['ventas_analisis.organizacion_ventas'] | url_encode }}&Plant={{ _filters['ventas_analisis.nombre_planta'] | url_encode }}&Client={{ _filters['ventas_analisis.nombre_cliente'] | url_encode }}&Category={{ _filters['ventas_analisis.categoria'] | url_encode }}&Global+Category={{ _filters['ventas_analisis.categoria_global'] | url_encode }}&Addressee+Country={{ ventas_analisis.pais_destinatario_._value | url_encode }}&Currency={{ _filters['ventas_analisis.moneda_conversion'] | url_encode }}"
+      url: "https://envasesdirectoaddon.cloud.looker.com/dashboards/129?Date={{ _filters['ventas_consolidado.date_filter'] | url_encode }}&Region={{ _filters['ventas_consolidado.region'] | url_encode }}&Cluster={{ _filters['ventas_consolidado.cluster'] | url_encode }}&Country={{ _filters['ventas_consolidado.pais'] | url_encode }}&Sales+Org={{ _filters['ventas_consolidado.organizacion_ventas'] | url_encode }}&Plant={{ _filters['ventas_consolidado.nombre_planta'] | url_encode }}&Client={{ _filters['ventas_consolidado.nombre_cliente'] | url_encode }}&Category={{ _filters['ventas_consolidado.categoria'] | url_encode }}&Global+Category={{ _filters['ventas_consolidado.categoria_global'] | url_encode }}&Addressee+Country={{ ventas_consolidado.pais_destinatario_._value | url_encode }}&Currency={{ _filters['ventas_consolidado.moneda_conversion'] | url_encode }}"
 
     }
 
     link: {
       label: "Cluster - Addressee Country"
-      url: "https://envasesdirecto.cloud.looker.com/dashboards/361?Date={{ _filters['ventas_analisis.date_filter'] | url_encode }}&Region={{ _filters['ventas_analisis.region'] | url_encode }}&Cluster={{ _filters['ventas_analisis.cluster'] | url_encode }}&Country={{ _filters['ventas_analisis.pais'] | url_encode }}&Sales+Org={{ _filters['ventas_analisis.organizacion_ventas'] | url_encode }}&Plant={{ _filters['ventas_analisis.nombre_planta'] | url_encode }}&Client={{ _filters['ventas_analisis.nombre_cliente'] | url_encode }}&Category={{ _filters['ventas_analisis.categoria'] | url_encode }}&Global+Category={{ _filters['ventas_analisis.categoria_global'] | url_encode }}&Addressee+Country={{ ventas_analisis.pais_destinatario_._value | url_encode }}&Currency={{ _filters['ventas_analisis.moneda_conversion'] | url_encode }}"
+      url: "https://envasesdirectoaddon.cloud.looker.com/dashboards/128?Date={{ _filters['ventas_consolidado.date_filter'] | url_encode }}&Region={{ _filters['ventas_consolidado.region'] | url_encode }}&Cluster={{ _filters['ventas_consolidado.cluster'] | url_encode }}&Country={{ _filters['ventas_consolidado.pais'] | url_encode }}&Sales+Org={{ _filters['ventas_consolidado.organizacion_ventas'] | url_encode }}&Plant={{ _filters['ventas_consolidado.nombre_planta'] | url_encode }}&Client={{ _filters['ventas_consolidado.nombre_cliente'] | url_encode }}&Category={{ _filters['ventas_consolidado.categoria'] | url_encode }}&Global+Category={{ _filters['ventas_consolidado.categoria_global'] | url_encode }}&Addressee+Country={{ ventas_consolidado.pais_destinatario_._value | url_encode }}&Currency={{ _filters['ventas_consolidado.moneda_conversion'] | url_encode }}"
     }
 
     #drill_fields: [ nombre_cliente,month_amount]
@@ -1750,6 +1758,4 @@ VTS as (
     drill_fields: [ nombre_cliente, vs_total_qty_bud_ytd,total_qty_ytd,total_qty_bud_ytd]
 
   }
-
-
 }

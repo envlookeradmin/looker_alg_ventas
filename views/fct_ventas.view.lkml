@@ -30,7 +30,7 @@ view: ventas {
       Pais_Destinatario,
       Ciudad_Destinatario,
       Organizacion_Ventas,
-      Division,
+      Sector,
       Unidad_Base,
       Categoria_Global,
       Categoria,
@@ -39,7 +39,6 @@ view: ventas {
       '' AS Moneda_Conversion,
       1 AS Bandera_Resumen,
       0 AS Bandera_Total,
-      --Orden,
       Cantidad,
       Monto_MXN,
       NULL AS Tipo_Cambio,
@@ -49,6 +48,7 @@ view: ventas {
       NULL AS Tipo_Cambio_AVG_anual_LY,
       Monto AS Monto_Transaccion
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar`
+      WHERE Division = 'ALG'
 
       UNION ALL
 
@@ -81,7 +81,7 @@ view: ventas {
       '' AS Pais_Destinatario,
       '' AS Ciudad_Destinatario,
       v.Organizacion_Ventas,
-      v.Division,
+      v.Sector,
       '' AS Unidad_Base,
       '' AS Categoria_Global,
       'zTOTAL LOCAL '|| v.Moneda_Transaccion  AS Categoria,
@@ -90,7 +90,6 @@ view: ventas {
       '' AS Moneda_Conversion,
       0 AS Bandera_Resumen,
       0 AS Bandera_Total,
-      --'Z91001' AS Orden,
       0 AS Cantidad,
       0 AS Monto_MXN,
       NULL AS Tipo_Cambio,
@@ -100,7 +99,8 @@ view: ventas {
       NULL AS Tipo_Cambio_AVG_anual_LY,
       SUM(v.Monto) AS Monto_Transaccion,
       FROM `@{GCP_PROJECT}.@{REPORTING_DATASET1}.Fact_Ventas_Columnar` v
-      WHERE v.Moneda_Transaccion IN ('CAD','DKK','GTQ')
+      WHERE v.Division = 'ALG'
+      and v.Moneda_Transaccion IN ('CAD','DKK','GTQ')
       GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
       UNION ALL
 
@@ -133,7 +133,7 @@ view: ventas {
       '' AS Pais_Destinatario,
       '' AS Ciudad_Destinatario,
       v.Organizacion_Ventas,
-      v.Division,
+      v.Sector,
       '' AS Unidad_Base,
       '' AS Categoria_Global,
       CASE
@@ -158,7 +158,6 @@ view: ventas {
       ELSE 0
       END AS Bandera_Resumen,
       1 AS Bandera_Total,
-      --D_MC.Orden AS Orden,
       0 AS Cantidad,
       0 AS Monto_MXN,
       D_TC.Tipo_Cambio,
@@ -240,7 +239,7 @@ view: ventas {
       ELSE D_MC.Moneda_Conversion
       END ) = D_TC.Moneda_Conversion
       and v.Tipo_Transaccion = D_TC.Presupuesto
-
+      WHERE v.Division = 'ALG'
       GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43
       ;;
   }
@@ -437,7 +436,7 @@ view: ventas {
 
   dimension: division {
     type: string
-    sql: ${TABLE}.Division ;;
+    sql: ${TABLE}.Sector ;;
   }
 
   dimension: unidad_base {
