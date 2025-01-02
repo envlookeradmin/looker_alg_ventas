@@ -40,3 +40,14 @@ explore: ventas_analisis {
   }
 
 }
+
+explore: ventas_consolidado {
+  access_filter: {
+    field: ventas_consolidado.cluster
+    user_attribute: alg_cluster
+  }
+  access_filter: {
+    field: ventas_consolidado.id_planta
+    user_attribute: alg_plant
+  }
+}
