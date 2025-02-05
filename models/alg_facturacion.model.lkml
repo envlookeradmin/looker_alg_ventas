@@ -43,6 +43,10 @@ explore: ventas_analisis {
 
 explore: ventas_consolidado {
   access_filter: {
+    field: ventas_consolidado.division
+    user_attribute: envases_division
+  }
+  access_filter: {
     field: ventas_consolidado.cluster
     user_attribute: alg_cluster
   }
