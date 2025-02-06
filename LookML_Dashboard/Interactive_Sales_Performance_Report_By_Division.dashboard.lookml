@@ -5,7 +5,7 @@
   preferred_viewer: dashboards-next
   crossfilter_enabled: true
   description: ''
-  preferred_slug: TsRDVno4x22wYCe0cTk39W
+  preferred_slug: Hz07H9r1wZLC0vBf03xxGk
   elements:
   - title: Sales by category
     name: Sales by category
@@ -1698,12 +1698,12 @@
   - name: División
     title: División
     type: field_filter
-    default_value: ALG
+    default_value: ALG,ALU,PET
     allow_multiple_values: true
     required: true
     ui_config:
-      type: dropdown_menu
-      display: inline
+      type: advanced
+      display: popover
     model: alg_facturacion
     explore: ventas_consolidado
     listens_to_filters: []
