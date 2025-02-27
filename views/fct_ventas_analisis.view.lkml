@@ -1059,6 +1059,23 @@ VTS as (
     drill_fields: [ nombre_cliente, vs_total_bud_mtd_, total_amount_mtd, total_amount_bud_mtd]
   }
 
+  measure: vs_total_qty_bud_mtd_ {
+    group_label: "Monthly"
+    label: "% VS TOTAL QTY BUD MTD_"
+    type: number
+    sql: CASE
+          WHEN ${total_qty_bud_mtd} = 0 AND ${total_qty_mtd} = 0
+          THEN 0
+          WHEN ${total_qty_bud_mtd} = 0 AND ${total_qty_mtd} > 0
+          THEN 1
+          ELSE ${total_qty_mtd}/ NULLIF(${total_qty_bud_mtd},1)
+         END * 100;;
+
+      value_format: "0.00\%"
+
+      drill_fields: [ nombre_cliente, vs_total_bud_mtd_, total_amount_mtd, total_amount_bud_mtd]
+    }
+
   #MONTHLY-QUANTITY-MTD
 
   measure: national_qty_mtd {
