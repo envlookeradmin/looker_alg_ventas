@@ -527,72 +527,8 @@ view: ventas {
           %}
         <p style="color: white; background-color: #5e2129; font-size:100%; text-align:left">{{ rendered_value }}</p>
 
-      {% elsif
-      value != 'CP 19L' and
-      value != 'CP 15L' and
-      value != 'CP 10L' and
-      value != 'CP 08L' and
-      value != 'CP 04L' and
-
-      value != 'Club (Alu)' and
-      value != 'Club (Steel)' and
-      value != 'Hansa' and
-      value != 'Dingley' and
-      value != 'Round Fish' and
-      value != 'Fish - Other' and
-      value != 'Draught Kegs' and
-      value != 'Gravity Kegs' and
-      value != 'Beverage Miscellaneous' and
-      value != 'Tin Cans' and
-      value != 'Vacuum Ink' and
-      value != 'Pails' and
-      value != 'Hobbocks' and
-      value != 'Square' and
-
-      value != 'Plastic' and
-      value != 'Industrial - Others' and
-
-      value != 'Fish - 1/2 Oval' and
-      value != 'Fish - 1/4 Oval' and
-      value != 'Fish - 127' and
-      value != 'Fish - 150' and
-      value != 'Fish - 153' and
-      value != 'Fish - 65' and
-      value != 'Fish - 73' and
-      value != 'Fish - 83' and
-      value != 'Fish - 99' and
-      value != 'Fish - Anchoas' and
-      value != 'Fish - Club' and
-      value != 'Fish - Goods for Resale' and
-      value != 'Fish - Others' and
-      value != 'Fish - Pails' and
-      value != 'Fish - RR90' and
-
-      value != 'Vegetables - 153' and
-      value != 'Vegetables - 65' and
-      value != 'Vegetables - 73' and
-      value != 'Vegetables - 83' and
-      value != 'Vegetables - 99' and
-      value != 'Vegetables - Club' and
-      value != 'Vegetables - Goods for Resale' and
-      value != 'Vegetables - Others' and
-
-      value != 'Industrial - 73' and
-      value != 'Industrial - 99' and
-      value != 'Industrial - General Line' and
-      value != 'Industrial - Goods for Resale' and
-      value != 'Industrial - Others' and
-      value != 'Industrial - Pails' and
-
-      value != 'Print and Coating Services - Goods for Resale' and
-      value != 'Print and Coating Services - Others' and
-      value != 'Print and Coating Services - Pails'
-
-      %}
-      <p style="color: black; font-weight: bold; font-size:100%; text-align:left">{{ rendered_value }}</p>
-
       {% else %}
-      <p style="">{{ rendered_value }}</p>
+      <p style="color: black; font-weight: bold; font-size:100%; text-align:left">{{ rendered_value }}</p>
       {% endif %} ;;
 
   }
