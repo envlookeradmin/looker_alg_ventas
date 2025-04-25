@@ -55,3 +55,5 @@ explore: ventas_consolidado {
     user_attribute: alg_plant
   }
 }
+
+explore: ventas_cancelaciones {}
