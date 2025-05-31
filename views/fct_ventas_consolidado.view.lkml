@@ -170,7 +170,8 @@ view: ventas_consolidado {
   }
 
   dimension: id_fuente {
-    hidden: yes
+    hidden: no
+    label: "Fuente"
     type: string
     sql: ${TABLE}.ID_Fuente ;;
   }
@@ -248,7 +249,8 @@ view: ventas_consolidado {
 
   dimension: id_planta {
     group_label: "Planta"
-    hidden: yes
+    label: "Planta"
+    hidden: no
     type: string
     sql: ${TABLE}.Planta ;;
   }
@@ -1758,4 +1760,127 @@ view: ventas_consolidado {
     drill_fields: [ nombre_cliente, vs_total_qty_bud_ytd,total_qty_ytd,total_qty_bud_ytd]
 
   }
+
+  measure: amount_bud_mtd_converted {
+    group_label: "Budget monitor"
+    label: "Amount bud MTD - {{ _filters['ventas_consolidado.moneda_conversion'] }}"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_mtd};;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    filters: {
+      field: filtro_mtd
+      value: "yes"
+    }
+
+    value_format_name: "usd"
+
+  }
+
+  measure: amount_bud_ytd_converted {
+    group_label: "Budget monitor"
+    label: "Amount bud YTD  - {{ _filters['ventas_consolidado.moneda_conversion'] }}"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_mtd};;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    filters: {
+      field: filtro_ytd
+      value: "yes"
+    }
+
+    value_format_name: "usd"
+
+  }
+
+  measure: amount_bud_mtd {
+    group_label: "Budget monitor"
+    label: "Amount bud MTD"
+    type: sum
+    sql: ${monto_transaccion} ;;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    filters: {
+      field: filtro_mtd
+      value: "yes"
+    }
+
+    value_format_name: "usd"
+
+  }
+
+  measure: amount_bud_ytd {
+    group_label: "Budget monitor"
+    label: "Amount bud YTD"
+    type: sum
+    sql: ${monto_transaccion} ;;
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    filters: {
+      field: filtro_ytd
+      value: "yes"
+    }
+
+    value_format_name: "usd"
+
+  }
+
+  measure: dias_habiles_mtd {
+    group_label: "Budget monitor"
+    label: "Dias habiles MTD"
+    type: count_distinct
+    sql: ${fecha} ;;
+
+    value_format_name: "decimal_0"
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    filters: {
+      field: filtro_mtd
+      value: "yes"
+    }
+
+  }
+
+  measure: dias_habiles_ytd {
+    group_label: "Budget monitor"
+    label: "Dias habiles YTD"
+    type: count_distinct
+    sql: ${fecha} ;;
+
+    value_format_name: "decimal_0"
+
+    filters: [tipo_transaccion: "Presupuesto"]
+
+    filters: {
+      field: filtro_ytd
+      value: "yes"
+    }
+
+  }
+
+  measure: monto_dia_mtd {
+    group_label: "Budget monitor"
+    label: "Monto p / dia MTD"
+    type: number
+    sql: SAFE_DIVIDE( ${amount_bud_mtd} , ${dias_habiles_mtd} ) ;;
+
+    value_format_name: "usd"
+
+  }
+
+  measure: monto_dia_ytd {
+    group_label: "Budget monitor"
+    label: "Monto p / dia YTD"
+    type: number
+    sql: SAFE_DIVIDE( ${amount_bud_ytd} , ${dias_habiles_ytd} ) ;;
+
+    value_format_name: "usd"
+
+  }
+
 }

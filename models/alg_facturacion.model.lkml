@@ -6,7 +6,7 @@ connection: "@{CONNECTION_NAME}"
 include: "/views/**/*.view.lkml"
 
 # include all the dashboards
-include: "/**/*.dashboard"
+#include: "/**/*.dashboard"
 
 datagroup: alg_facturacion_default_datagroup {
   # sql_trigger: SELECT MAX(id) FROM etl_log;;
