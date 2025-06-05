@@ -57,3 +57,5 @@ explore: ventas_consolidado {
 }
 
 explore: ventas_cancelaciones {}
+
+explore: ventas_lotes {}
