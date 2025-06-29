@@ -59,3 +59,4 @@ explore: ventas_consolidado {
 explore: ventas_cancelaciones {}
 
 explore: ventas_lotes {}
+explore: ventas_usa_can {}
