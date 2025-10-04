@@ -6,6 +6,16 @@ constant: CONNECTION_NAME {
   export: override_required
 }
 
+constant: CONNECTION_NAME_QA {
+  value: "envases_analytics_qa"
+  export: override_required
+}
+
+constant: GCP_PROJECT_QA {
+  value: "envases-analytics-qa"
+  export: override_required
+}
+
 constant: GCP_PROJECT {
   value: "envases-analytics-eon-poc"
   export: override_required
