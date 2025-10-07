@@ -5,6 +5,8 @@ view: ventas_historico {
       SELECT
       *
       FROM `@{GCP_PROJECT_QA}.@{REPORTING_DATASET1}.Fact_Ventas_Historico` h
+      WHERE EXTRACT(YEAR FROM Fecha) <= 2024
+      AND filtro = FALSE
       UNION ALL
       SELECT
       '' AS IDFuente,
@@ -35,8 +37,10 @@ view: ventas_historico {
       0 AS TipoCambioEUR,
       0 AS TipoCambioDKK,
       Cantidad,
-      0 ImporteNeto
+      0 ImporteNeto,
+      null AS filtro
       FROM `@{GCP_PROJECT_QA}.@{REPORTING_DATASET}.Mercado_ALG`
+      WHERE EXTRACT(YEAR FROM Fecha) <= 2024
       ;;
   }
 
