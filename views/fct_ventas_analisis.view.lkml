@@ -180,7 +180,7 @@ VTS as (
   dimension_group: dates {
     hidden: no
     type: time
-    timeframes: [raw, date, week, month, quarter, year]
+    timeframes: [raw, date, week, month, month_name, quarter, year]
     convert_tz: no
     datatype: date
     sql: ${TABLE}.Fecha ;;
