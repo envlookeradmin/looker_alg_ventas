@@ -505,6 +505,42 @@ VTS as (
       and  ${fecha} <= DATE_ADD(DATE_ADD( DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), DAY),INTERVAL -1 year),INTERVAL -0 day)   ;;
   }
 
+  dimension: fecha_inicio {
+    hidden: yes
+    type: date
+    sql: DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), YEAR);;
+  }
+  dimension: fecha_fin {
+    hidden: yes
+    type: date
+    sql: DATE_SUB(CAST({% date_end date_filter %} AS DATE), INTERVAL 1 DAY);;
+  }
+
+  dimension: fecha_inicio_anio_ant {
+    hidden: yes
+    type: date
+    sql: DATE_SUB(DATE_TRUNC(CAST({% date_start date_filter %} AS DATE), YEAR), INTERVAL 1 YEAR);;
+  }
+  dimension: fecha_fin_anio_ant {
+    hidden: yes
+    type: date
+    sql: DATE_SUB(DATE_SUB(CAST({% date_end date_filter %} AS DATE), INTERVAL 1 DAY), INTERVAL 1 YEAR);;
+  }
+
+  dimension: es_seleccionado {
+    type: yesno
+    hidden: yes
+    description: "Determina los registros que pertenecen al año actual"
+    sql: ${dates_raw} BETWEEN ${fecha_inicio} AND ${fecha_fin};;
+  }
+
+  dimension: es_seleccionado_anio_anterior {
+    type: yesno
+    hidden: yes
+    description: "Determina los registros que pertenecen al año anterior del rango de fecha inicio y fecha fin seleccionado"
+    sql: ${dates_raw} BETWEEN ${fecha_inicio_anio_ant} AND ${fecha_fin_anio_ant};;
+  }
+
  #Filtro personalizado
 
   dimension: filtro_desde_hasta{
@@ -801,6 +837,101 @@ VTS as (
     value_format: "#,##0"
   }
 
+  measure: quantity {
+    group_label: "Date range"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Venta", es_seleccionado: "yes" ]
+
+    drill_fields: [ nombre_cliente,quantity]
+
+    value_format: "#,##0"
+  }
+
+  measure: bud_quantity {
+    group_label: "Date range"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Presupuesto", es_seleccionado: "yes"]
+
+    drill_fields: [ nombre_cliente,bud_quantity]
+
+    value_format: "#,##0"
+  }
+
+  measure: quantity_ly {
+    group_label: "Date range"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Venta", es_seleccionado_anio_anterior: "yes" ]
+
+    drill_fields: [ nombre_cliente,quantity_ly]
+
+    value_format: "#,##0"
+  }
+
+  measure: bud_quantity_ly {
+    group_label: "Date range"
+    type: sum
+    sql: ${cantidad};;
+
+    filters: [tipo_transaccion: "Presupuesto", es_seleccionado_anio_anterior: "yes"]
+
+    drill_fields: [ nombre_cliente,bud_quantity_ly]
+
+    value_format: "#,##0"
+  }
+
+  measure: amount {
+    group_label: "Date range"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario_sa};;
+
+    filters: [tipo_transaccion: "Venta", es_seleccionado: "yes" ]
+
+    drill_fields: [ nombre_cliente,amount]
+
+    value_format: "$#,##0.00"
+  }
+
+  measure: bud_amount {
+    group_label: "Date range"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario_sa};;
+
+    filters: [tipo_transaccion: "Presupuesto", es_seleccionado: "yes"]
+
+    drill_fields: [ nombre_cliente,bud_amount]
+
+    value_format: "$#,##0.00"
+  }
+
+  measure: amount_ly {
+    group_label: "Date range"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario_sa};;
+
+    filters: [tipo_transaccion: "Venta", es_seleccionado_anio_anterior: "yes" ]
+
+    drill_fields: [ nombre_cliente,amount_ly]
+
+    value_format: "$#,##0.00"
+  }
+
+  measure: bud_amount_ly {
+    group_label: "Date range"
+    type: sum
+    sql: ${monto_transaccion} * ${tc_diario_sa};;
+
+    filters: [tipo_transaccion: "Presupuesto", es_seleccionado_anio_anterior: "yes"]
+
+    drill_fields: [ nombre_cliente,bud_amount_ly]
+
+    value_format: "$#,##0.00"
+  }
 
   #MONTHLY-MONEY-MTD
 
