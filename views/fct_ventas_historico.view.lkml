@@ -305,5 +305,29 @@ view: ventas_historico {
     filters: [tipo: "Mercado"]
     value_format_name: decimal_0
   }
+  #Métricas especiales para USA
+  dimension: is_ohio {
+    type: yesno
+    hidden: yes
+    sql: ${codigo_planta} in ('9520', '9521') ;;
+  }
 
+  measure: cantidad_Ohio {
+    type: sum
+    label: "Cantidad Ohio"
+    group_label: "Metricas USA"
+    sql:${cantidad_facturada}  ;;
+
+    filters: [tipo: "Venta", is_ohio: "yes"]
+    value_format_name: decimal_0
+  }
+  measure: cantidad_mx {
+    type: sum
+    label: "Cantidad MX"
+    group_label: "Metricas USA"
+    sql:${cantidad_facturada}  ;;
+
+    filters: [tipo: "Venta", is_ohio: "no", cluster: "USA"]
+    value_format_name: decimal_0
+  }
 }
