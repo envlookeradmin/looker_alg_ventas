@@ -1152,8 +1152,8 @@ VTS as (
     sql: CASE
           WHEN ${total_amount_mtd} > 0 AND ${total_amount_bud_mtd} = 0 THEN 1
           WHEN ${total_amount_mtd} = 0 AND ${total_amount_bud_mtd} > 0 THEN -1
-          WHEN (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1=-1 THEN 0
-          ELSE (${total_amount_mtd} /  NULLIF (${total_amount_bud_mtd},0))-1
+          WHEN SAFE_DIVIDE(${total_amount_mtd} , IFNULL (${total_amount_bud_mtd},0)) -1 = -1 THEN 0
+          ELSE IFNULL(SAFE_DIVIDE(${total_amount_mtd} , IFNULL (${total_amount_bud_mtd},0)) ,0) -1
          END * 100;;
 
     html:
@@ -1626,8 +1626,8 @@ VTS as (
     sql: CASE
           WHEN ${total_amount_ytd} > 0 AND ${total_amount_bud_ytd} = 0 THEN 1
           WHEN ${total_amount_ytd} = 0 AND ${total_amount_bud_ytd} > 0 THEN -1
-          WHEN (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1=-1 THEN 0
-          ELSE (${total_amount_ytd} /  NULLIF (${total_amount_bud_ytd},0))-1
+          WHEN SAFE_DIVIDE(${total_amount_ytd},IFNULL (${total_amount_bud_ytd},0)) -1 = -1 THEN 0
+          ELSE IFNULL(SAFE_DIVIDE(${total_amount_ytd},IFNULL (${total_amount_bud_ytd},0)),0) -1
          END * 100;;
 
     html:
