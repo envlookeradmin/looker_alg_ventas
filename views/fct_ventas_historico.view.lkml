@@ -5,7 +5,7 @@ view: ventas_historico {
       SELECT
       *
       FROM `@{GCP_PROJECT_QA}.@{REPORTING_DATASET1}.Fact_Ventas_Historico` h
-      WHERE EXTRACT(YEAR FROM Fecha) <= 2024
+      WHERE EXTRACT(YEAR FROM Fecha) <= 2025
       AND filtro = FALSE
       UNION ALL
       SELECT
@@ -40,7 +40,7 @@ view: ventas_historico {
       0 ImporteNeto,
       null AS filtro
       FROM `@{GCP_PROJECT_QA}.@{REPORTING_DATASET}.Mercado_ALG`
-      WHERE EXTRACT(YEAR FROM Fecha) <= 2024
+      WHERE EXTRACT(YEAR FROM Fecha) <= 2025
       ;;
   }
 
