@@ -305,6 +305,16 @@ view: ventas_historico {
     filters: [tipo: "Mercado"]
     value_format_name: decimal_0
   }
+
+  measure: cantidad_mercado_mpe {
+    type: sum
+    label: "Cantidad Mercado (MPE)"
+    sql:${cantidad_facturada}  ;;
+
+    filters: [tipo: "Mercado MPE"]
+    value_format_name: decimal_0
+  }
+
   #Métricas especiales para USA
   dimension: is_ohio {
     type: yesno
