@@ -309,9 +309,16 @@ view: ventas_historico {
   measure: cantidad_mercado_mpe {
     type: sum
     label: "Cantidad Mercado (MPE)"
-    sql:${cantidad_facturada}  ;;
+    sql: ${cantidad_facturada} ;;
 
     filters: [tipo: "Mercado MPE"]
+    value_format_name: decimal_0
+  }
+
+  measure: cantidad_por_tipo {
+    type: sum
+    sql: ${cantidad_facturada} ;;
+
     value_format_name: decimal_0
   }
 
