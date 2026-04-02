@@ -326,7 +326,7 @@ view: ventas_historico {
   dimension: is_ohio {
     type: yesno
     hidden: yes
-    sql: ${codigo_planta} in ('9520', '9521') ;;
+    sql: ${codigo_planta} in ('9520') ;;
   }
 
   measure: cantidad_Ohio {
