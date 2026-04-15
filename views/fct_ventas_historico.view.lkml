@@ -247,6 +247,33 @@ view: ventas_historico {
     value_format_name: decimal_0
   }
 
+  #Métricas especiales para Europa
+  dimension: is_europa_w_o_exportacion {
+    type: yesno
+    hidden: yes
+    sql: ${region} = "Europa" AND ${canal_distribucion} = "Nacional" OR (${region} = "Europa" AND ${canal_distribucion} = "Exportacion" AND ${pais_cliente} IN ('Denmark', 'Sweden', 'Switzerland', 'Netherlands', 'Germany', 'Austria', 'Hungary', 'Spain') ) ;;
+  }
+
+
+
+  measure: cantidad_europa_sin_exportacion {
+    type: sum
+    label: "Europa Envases (W/O Export)"
+    sql:${cantidad_facturada}  ;;
+
+    filters: [tipo: "Venta", is_europa_w_o_exportacion: "yes"]
+    value_format_name: decimal_0
+  }
+
+  measure: cantidad_europa_mercado_mpe {
+    type: sum
+    label: "Europa Mercado (MPE)"
+    sql: ${cantidad_facturada} ;;
+
+    filters: [tipo: "Mercado MPE", region: "Europa" ]
+    value_format_name: decimal_0
+  }
+
   measure: monto_moneda_original {
     type: sum
     group_label: "Montos"
