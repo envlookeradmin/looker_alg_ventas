@@ -285,6 +285,16 @@ view: ventas_historico {
     value_format_name: decimal_0
   }
 
+  measure: cantidad_europa_mercado {
+    type: sum
+    group_label: "Metricas Europa"
+    label: "Mercado"
+    sql: ${cantidad_facturada} ;;
+
+    filters: [tipo: "Mercado", region: "Europa" ]
+    value_format_name: decimal_0
+  }
+
   measure: monto_moneda_original {
     type: sum
     group_label: "Montos"
